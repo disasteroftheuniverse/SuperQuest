@@ -1,6 +1,6 @@
 {
   "name": "superquest",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A collection of AFRAME components tailored for use with the Oculus Quest mobile virtual reality headset.",
   "main": "index.js",
   "scripts": {
