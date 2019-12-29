@@ -4,3 +4,4 @@ SuperQuest.code-workspace
 .DS_Store
 *.mayaSwatches
 *hand_animation.gif
+*src/assets/hands_demo_animation.mb
