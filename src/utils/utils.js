@@ -28,6 +28,30 @@ AFRAME.utils.entity.onModel = function (modelEl, callback, context) {
        modelEl.addEventListener('object3dset', waitForModel);
     }
  };
+
+ AFRAME.utils.entity.onElLoaded = function (el, callback, context, args) {
+   if (context) {
+      callback = callback.bind(context);
+   }
+   var waitForCallback = function (e) {
+      if (args) {
+         callback(args);
+      } else {
+         callback();
+      }
+      el.removeEventListener('loaded', waitForCallback);
+   };
+   if (el.hasLoaded) {
+      if (args) {
+         callback(args);
+      } else {
+         callback();
+      }
+   } else {
+      el.addEventListener('loaded', waitForCallback);
+   }
+};
+
  AFRAME.utils.entity.onObject3DAdded = function (el, name, callback, context, args) {
     if (context) {
        callback = callback.bind(context);

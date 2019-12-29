@@ -1,29 +1,11 @@
 /*jshint esversion: 8*/
-/*
-const AABB_UTILS = {
-   boxToArray: function (box, arr) {
-      arr[0] = box.min.x;
-      arr[1] = box.min.y;
-      arr[2] = box.min.z;
-      arr[3] = box.max.x;
-      arr[4] = box.max.y;
-      arr[5] = box.max.z;
 
-      return arr;
-   }
-};
 
-THREE.Box3.prototype.toBIArray = function (arr) {
-   this.min.toArray(arr, 0);
-   this.max.toArray(arr, 3);
-   return arr;
-};*/
-//const boxIntersect = require('box-intersect');
-//var CollideWorker = require('./aabb.worker');
+//require('./../../node_modules/');
 module.exports = {
    'collider-system': AFRAME.registerSystem('collider', {
       schema: {
-         debug: {type: 'boolean',default: true}
+         debug: { type: 'boolean', default: true }
       },
       init: function () {
 
@@ -102,22 +84,36 @@ module.exports = {
          group: { type: 'string', default: 'all' },
          collidesWith: { type: 'string', default: 'none' },
 
-         //autoRefresh: { type: 'boolean', default: false },
+         bounds: { type: 'string', default: 'auto', oneOf: ['auto', 'proxy', 'box', 'mesh'] },
+
+         size: { type: 'vec3', default: { x: 0, y: 0, z: 0 } },
+
          static: { type: 'boolean', default: false },
+
          enabled: { type: 'boolean', default: true },
+
       },
       init: function () {
          this.AABB = new THREE.Box3();
 
          this.onEntityLoaded = this.onEntityLoaded.bind(this);
          this.onModelLoaded = this.onModelLoaded.bind(this);
-         this.createAABB = this.createAABB.bind(this);
+
+         this.createAABB_Auto = this.createAABB_Auto.bind(this);
+         this.createAABB_Mesh = this.createAABB_Mesh.bind(this);
+         this.createAABB_Proxy = this.createAABB_Proxy.bind(this);
+         this.createAABB_Box = this.createAABB_Box.bind(this);
+
+
          this.onEntityLoaded = this.onEntityLoaded.bind(this);
 
          this.getIntersections = this.getIntersections.bind(this);
          this.updateIntersections = this.updateIntersections.bind(this);
          this.addIntersection = this.addIntersection.bind(this);
          this.removeIntersection = this.removeIntersection.bind(this);
+
+         //this.createAABB_Auto = this.createAABB.auto.bind(this);
+
 
          this.clearedEls = [];
          this.intersectedEls = [];
@@ -128,13 +124,31 @@ module.exports = {
          this.__intersections = [];
          this.__intersectionsCleared = [];
 
-         this.__elapsed = 0;
-         AFRAME.utils.entity.onLoad(this.el, this.onEntityLoaded, this);
+         this.__elapsed = 0; var component = this; //var objmap = component.el.object3DMap;
+
+         //console.log(moops);
+         //AFRAME.utils.entity.onLoad(this.el, this.onEntityLoaded, this);
       },
-      onEntityLoaded: function () {
-         AFRAME.utils.entity.onModel(this.el, this.onModelLoaded, this);
+      update: function (oldData) {
+         if (!oldData.bounds) {
+            switch (this.data.bounds) {
+               case 'box':
+                  AFRAME.utils.entity.onElLoaded(this.el, this.onEntityLoaded, this, this.createAABB_Auto);
+                  break;
+               case 'auto':
+                  AFRAME.utils.entity.onElLoaded(this.el, this.onEntityLoaded, this, this.createAABB_Auto);
+                  break;
+            }
+         }
       },
-      onModelLoaded: function () {
+      onEntityLoaded: function (type) {
+         AFRAME.utils.entity.onObject3DAdded(this.el, 'mesh', this.onModelLoaded, this, type);
+      },
+      onModelLoaded: function (type) {
+         type();
+      },
+      createAABB_Auto: function () {
+         //console.log('auto');
          this.AABB.setFromObject(this.el.object3DMap.mesh);
 
          var size = new THREE.Vector3();
@@ -148,16 +162,97 @@ module.exports = {
          center.sub(positionWorld);
          size.divide(this.el.object3D.scale);
 
-         if (!this.el.components.proxy) {
-            this.el.setAttribute('proxy', {
-               size: size,
-               offset: center
-            });
-         }
+         this.el.setAttribute('proxy', {
+            size: size,
+            offset: center
+         });
 
-         AFRAME.utils.entity.onObject3DAdded(this.el, 'proxy', this.createAABB, this);
+         this.AABB.setFromObject(this.el.object3DMap.proxy);
+
+         var helper = new THREE.Box3Helper(this.AABB);
+         this.el.sceneEl.object3D.add(helper);
+
+         this.updateAABB = function () {
+            this.AABB.setFromObject(this.el.object3DMap.proxy);
+         };
+
+         this.updateAABB = this.updateAABB.bind(this);
+         this.system.subscribe(this);
+         this.subscribed = true;
       },
-      createAABB: function () {
+      createAABB_Box: function () {
+         var positionWorld = new THREE.Vector3();
+
+         this.el.object3D.getWorldPosition(positionWorld);
+         this.AABB.setFromCenterAndSize(positionWorld, this.data.size);
+
+         var helper = new THREE.Box3Helper(this.AABB);
+         this.el.sceneEl.object3D.add(helper);
+
+         this.updateAABB = function () {
+            this.el.object3D.getWorldPosition(positionWorld);
+            this.AABB.setFromCenterAndSize(positionWorld, this.data.size);
+         };
+
+         this.updateAABB = this.updateAABB.bind(this);
+         this.system.subscribe(this);
+         this.subscribed = true;
+      },
+      createAABB_Proxy: function () {
+         //console.log('auto');
+         this.AABB.setFromObject(this.el.object3DMap.mesh);
+
+         var size = new THREE.Vector3();
+         var center = new THREE.Vector3();
+         var positionWorld = new THREE.Vector3();
+
+         this.AABB.getSize(size);
+         this.AABB.getCenter(center);
+
+         this.el.object3D.getWorldPosition(positionWorld);
+         center.sub(positionWorld);
+         size.divide(this.el.object3D.scale);
+
+
+         this.el.setAttribute('proxy', {
+            size: size,
+            offset: center
+         });
+
+         this.AABB.setFromObject(this.el.object3DMap.proxy);
+
+         var helper = new THREE.Box3Helper(this.AABB);
+         this.el.sceneEl.object3D.add(helper);
+
+         this.updateAABB = function () {
+            this.AABB.setFromObject(this.el.object3DMap.proxy);
+         };
+
+         this.updateAABB = this.updateAABB.bind(this);
+         this.system.subscribe(this);
+         this.subscribed = true;
+      },
+      createAABB_Mesh: function () {
+         //console.log('auto');
+         this.AABB.setFromObject(this.el.object3DMap.mesh);
+
+         var size = new THREE.Vector3();
+         var center = new THREE.Vector3();
+         var positionWorld = new THREE.Vector3();
+
+         this.AABB.getSize(size);
+         this.AABB.getCenter(center);
+
+         this.el.object3D.getWorldPosition(positionWorld);
+         center.sub(positionWorld);
+         size.divide(this.el.object3D.scale);
+
+
+         this.el.setAttribute('proxy', {
+            size: size,
+            offset: center
+         });
+
 
          this.AABB.setFromObject(this.el.object3DMap.proxy);
 
@@ -201,7 +296,7 @@ module.exports = {
 
          }
 
-         if (this.intersectedEls.length===0 && this.el.is('colliding')){
+         if (this.intersectedEls.length === 0 && this.el.is('colliding')) {
             this.el.removeState('colliding');
          }
 
@@ -428,50 +523,50 @@ module.exports = {
 
       }
    }),
-   'constraint': AFRAME.registerComponent('constraint',{
+   'constraint': AFRAME.registerComponent('constraint', {
       schema: {
-         parent: {type: 'selector'}   
+         parent: { type: 'selector' }
       },
-      init: function(){
+      init: function () {
 
          this.originalParent = this.el.object3D.parent;
 
       },
-      update: function(oldData){
+      update: function (oldData) {
 
-         if (!this.data.parent.object3DMap.constraint){
-            this.data.parent.setObject3D('constraint',new THREE.Group());
+         if (!this.data.parent.object3DMap.constraint) {
+            this.data.parent.setObject3D('constraint', new THREE.Group());
          }
 
          this.data.parent.object3DMap.constraint.attach(this.el.object3D);
          this.el.addState(this.data.parent);
-         
+
          if (oldData.parent && oldData.parent !== this.data.parent) {
             //console.log('constraintchanged');
 
-            this.el.emit('constraintchanged',{parent: this.data.parent, el: this.el},true);
-            oldData.parent.emit('constraintchanged',{parent: this.data.parent, el: this.el},true);
+            this.el.emit('constraintchanged', { parent: this.data.parent, el: this.el }, true);
+            oldData.parent.emit('constraintchanged', { parent: this.data.parent, el: this.el }, true);
 
          }
 
-         if (!oldData.parent){
+         if (!oldData.parent) {
             //console.log(this.data.parent);
 
-            this.el.emit('constraintadded',{parent: this.data.parent, el: this.el},true);
-            this.data.parent.emit('constraintadded',{parent: this.data.parent, el: this.el},true);
+            this.el.emit('constraintadded', { parent: this.data.parent, el: this.el }, true);
+            this.data.parent.emit('constraintadded', { parent: this.data.parent, el: this.el }, true);
 
          }
-         
+
 
 
       },
-      remove: function(){
+      remove: function () {
          //console.log('constraintremoved');
          this.originalParent.attach(this.el.object3D);
          this.el.removeState('constrained');
 
-         this.el.emit('constraintremoved',{parent: this.data.parent, el: this.el},false);
-         this.data.parent.emit('constraintremoved',{parent: this.data.parent, el: this.el},false);
+         this.el.emit('constraintremoved', { parent: this.data.parent, el: this.el }, false);
+         this.data.parent.emit('constraintremoved', { parent: this.data.parent, el: this.el }, false);
       }
    }),
    old: {

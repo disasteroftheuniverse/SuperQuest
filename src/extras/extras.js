@@ -1,6 +1,6 @@
 /*jshint esversion: 6*/
 
-var es6template = require('es6-template-strings');
+var es6template = require('./../../node_modules/es6-template-strings');
 
 module.exports = {
    rounded: AFRAME.registerComponent('rounded', {
