@@ -1,0 +1,34 @@
+{
+  "name": "superquest",
+  "version": "0.0.1",
+  "description": "A collection of AFRAME components tailored for use with the Oculus Quest mobile virtual reality headset.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "aframe",
+    "oculus",
+    "oculus",
+    "quest",
+    "quest",
+    "vr",
+    "virtual",
+    "reality",
+    "webvr",
+    "webxr",
+    "oculus",
+    "browser",
+    "quest",
+    "browser",
+    "browser"
+  ],
+  "author": "patrick pineda",
+  "license": "MIT",
+  "dependencies": {
+    "es6-template-strings": "^2.0.1",
+    "javascript-state-machine": "^3.1.0",
+    "oimo": "^1.0.9"
+  },
+  "devDependencies": {}
+}
