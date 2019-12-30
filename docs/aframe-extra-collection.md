@@ -10,13 +10,13 @@ A collection of miscellaneous components with varying degrees of usefulness.
 
 Creates a flat 2D rectangle with rounded corners. The appearance can be modified with [A-Frame 'material' component](https://aframe.io/docs/master/components/material.html).
 
-#### Example
+##### Example
 
 ```html
 <a-entity rounded="radius: 0.05; width: 1; height: 2;" material="color: blue;"></a-entity>
 ```
 
-#### Properties
+##### Properties
 
 | Property | Property Type | Default Value |  Description  |
 |---|---|---|---|
@@ -30,13 +30,13 @@ Creates a flat 2D rectangle with rounded corners. The appearance can be modified
 
 Restricts the movement of an object to a volume specified by minimum and maximum values in world space; Objects with the _clamp_ component cannot move beyond the limits defined by the min and max values.
 
-#### Example
+##### Example
 
 ```html
 <a-entity position="0 1 -1" clamp="min: -2 -4 -1; max: 2 5 3"></a-entity>
 ```
 
-#### Properties
+##### Properties
 
 | Property | Property Type | Default Value |  Description  |
 |---|---|---|---|
@@ -49,7 +49,7 @@ Restricts the movement of an object to a volume specified by minimum and maximum
 
 Calls `console.log` after a mesh is loaded;
 
-#### Example
+##### Example
 
 ```html
 <a-entity log-object3D></a-entity>
@@ -62,14 +62,14 @@ Calls `console.log` after a mesh is loaded;
 
 Aligns the Z-axis of an entity to always face towards a specified entity;
 
-#### Example
+##### Example
 
 ```html
 <a-entity id="foo" ></a-entity>
 <a-entity billboard="src: #foo;"></a-entity>
 ```
 
-#### Properties
+##### Properties
 
 | Property | Property Type | Default Value |  Description  |
 |---|---|---|---|
