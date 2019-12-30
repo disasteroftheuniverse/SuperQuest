@@ -1,10 +1,4 @@
 /*jshint esversion:6*/
-
-//SuperExtras
-
-
-
-
 /**
  *  Callback on 3d model loaded
  *

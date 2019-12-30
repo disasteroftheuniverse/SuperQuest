@@ -6,15 +6,14 @@
 //  \__/\__,_| .__/ \___|_| \___,_\ \__,_|\___|___/\__|
 //           |_|                                       
 
-require('./src/utils/utils');
-require('./src/extras/extras');
-require('./src/extras/shaders');
+require('./src/components/aframe-extra-utils');
+require('./src/components/aframe-extra-collection');
+require('./src/components/aframe-shader-extras');
 
-require('./src/components/teleporter-controls');
+require('./src/components/aframe-locomote-controls');
+require('./src/components/aframe-google-poly');
+require('./src/components/aframe-portals');
 
-require('./src/extras/google-poly');
-require('./src/extras/portals');
-
-require('./src/components/grab-controls');
-require('./src/components/hands');
+require('./src/components/aframe-oculus-quest-hands');
+//require('./src/components/hands');
 

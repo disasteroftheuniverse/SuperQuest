@@ -103,16 +103,16 @@ module.exports = {
 				type: 'vec3',
 				default: {
 					x: -2,
-					y: 0.5,
-					z: -0.1
+					y: -1,
+					z: -1
 				}
 			},
 			max: {
 				type: 'vec3',
 				default: {
-					x: 2,
-					y: 4,
-					z: -3
+					x: 1,
+					y: 1,
+					z: 1
 				}
 			}
 		},
