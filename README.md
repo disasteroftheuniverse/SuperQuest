@@ -2,7 +2,6 @@
 
 ![image](https://www.repostatus.org/badges/latest/wip.svg) [![Documentation Status](https://readthedocs.org/projects/superquest/badge/?version=latest)](https://superquest.readthedocs.io/?badge=latest)
 
-
 ```md
  __                        ____                _
 / _\_   _ _ __   ___ _ __ /___ \_   _  ___ ___| |_
