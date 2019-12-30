@@ -1,4 +1,5 @@
 # Hand Model
+
 A rigged hand model created in Autodesk Maya. May be modified to add additional hand poses and gestures.
 
 ![image](https://imgur.com/UQ2pqAd.gif)
