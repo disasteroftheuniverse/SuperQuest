@@ -1,5 +1,7 @@
 # Components
 
+[Home](./index)
+
 ## mixer-control
 
 Adds a click listener to an element to set aframe-extras/mesh-mixer on a model

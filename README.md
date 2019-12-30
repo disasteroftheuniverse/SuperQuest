@@ -1,6 +1,7 @@
 # SuperQuest: Oculus Quest AFrame Components
 
-![image](https://www.repostatus.org/badges/latest/wip.svg)
+![image](https://www.repostatus.org/badges/latest/wip.svg) [![Documentation Status](https://readthedocs.org/projects/superquest/badge/?version=latest)](https://superquest.readthedocs.io/?badge=latest)
+
 
 ```md
  __                        ____                _
@@ -10,7 +11,7 @@ _\ | |_| | |_) |  __| | / \_/ /| |_| |  __\__ | |_
 \__/\__,_| .__/ \___|_| \___,_\ \__,_|\___|___/\__|
          |_|
 │
-├── *assets*/
+├── assets/
 │   ├── hands.ma
 │   └── hands.fbx
 ├── components/
