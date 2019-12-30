@@ -19,11 +19,6 @@ Support may eventually be added for [Oculus Hand Tracking](https://www.oculus.co
 
 A wrapper for [oculus-touch-controls](https://aframe.io/docs/master/components/oculus-touch-controls.html) that adds additional events, methods and a [prescribed hand model](./assets.md). This model supports a range of pre-animated poses and gestures to accommodate common gestures a user might make in VR.
 
-Advanced users may consider replacing native grab and drop methods with their preferred grab controls. To use a custom grab or drop method, please use 
-```js
-AFRAME.utils.extendComponent('oculus-quest-hands', 'grab', (grabEvent) => {/*your custom grab code here*/});
-```
-
 The appearance can be modified with [A-Frame 'material' component](https://aframe.io/docs/master/components/material.html).
 
 **Examples**
@@ -74,7 +69,17 @@ A simple AABB collision detection system
 **Example**
 
 ```html
-<a-entity collider="interval: 40; group: foo; collidesWith: bar; bounds: auto; size: 0 0 0;static: false; enabled: true; autoRefesh: false;"></a-entity>
+<a-entity 
+collider="
+    interval: 40; 
+	 group: foo; 
+	 collidesWith: bar; 
+	 bounds: auto; 
+	 size: 0 0 0;
+	 static: false; 
+	 enabled: true; 
+	 autoRefesh: false;">
+</a-entity>
 ```
 
 **Properties**
