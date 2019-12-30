@@ -1,4 +1,6 @@
-# SuperQuest: Oculus Quest AFrame Components
+# SuperQuest
+
+## AFrame Components for the Oculus Quest
 
 ![image](https://www.repostatus.org/badges/latest/wip.svg)
 <pre>
