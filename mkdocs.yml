@@ -1,5 +1,6 @@
 site_name: Superquest
 pages:
     - Home: index.md
+    - Assets: assets.md
     - Components: components.md
 theme: readthedocs

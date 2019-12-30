@@ -1,6 +1,4 @@
-# Components
-
-[Home](./index)
+# components
 
 ## mixer-control
 
