@@ -196,26 +196,6 @@ module.exports = {
 			}
 		}
 	}),
-	signal_remove: AFRAME.registerComponent('event-remove', {
-		schema: {
-			on: {
-				type: 'string'
-			},
-			target: {
-				type: 'selector'
-			},
-			property: {
-				type: 'string'
-			}
-		},
-		init: function () {
-			this.onQualifiedEvent = function () {
-				this.data.target.removeAttribute(this.data.property);
-			};
-			this.onQualifiedEvent = this.onQualifiedEvent.bind(this);
-			this.el.addEventListener(this.data.on, this.onQualifiedEvent);
-		}
-	}),
 	signal: AFRAME.registerComponent('signal', {
 		schema: {
 			on: {
@@ -279,7 +259,6 @@ module.exports = {
 		schema: {
 			on: {
 				type: 'string',
-				//default: 'signal'
 			},
 			attr: {
 				type: 'string'
@@ -293,9 +272,7 @@ module.exports = {
 		__handleRegisteredEvents: function () {
 			var componentProperties;
 
-			if (this.el.dataset && this.el.dataset[this.id]) {
-				componentProperties = AFRAME.utils.styleParser.parse(this.el.dataset[this.id]);
-			}
+			componentProperties = AFRAME.utils.entity.getComponentProperty(this.el,`set__${this.id}`);
 
 			if (this.data.target !== 'none') {
 				this._targets = Array.from(document.querySelectorAll(this.data.target));
@@ -304,8 +281,6 @@ module.exports = {
 			}
 
 			var j = this._targets.length;
-			//console.log(j);
-			//console.log(this._targets);
 			var _target;
 
 			for (var i = 0; i < j; i++) {
@@ -321,14 +296,13 @@ module.exports = {
 			this.el.removeEventListener(evtname, this.__handleRegisteredEvents);
 		},
 		init: function () {
+
+
 			if (!this.id) {
 				console.error('Component id is required. Use signal-set__* to set an id.');
 				return;
 			}
-			if (!this.el.dataset || !this.el.dataset[this.id]) {
-				console.error('No component properties specified. Use an HTML data-* attribute to specify component properties.\n');
-				return;
-			}
+
 			this._targets = [];
 			this.__registerEventHandler = this.__registerEventHandler.bind(this);
 			this.__handleRegisteredEvents = this.__handleRegisteredEvents.bind(this);
@@ -359,6 +333,53 @@ module.exports = {
 		remove: function () {
 			this.__deRegisterEventHandler();
 		}
+	}),
+	attr_set: AFRAME.registerComponent('set', {
+
+		multiple: true,
+
+		init: function () {
+			if (!this.id) {
+				console.error('Component id is required. Use attr-set__* to set an id.');
+				return;
+			}
+			this.__data = AFRAME.utils.styleParser.parse(this.data);
+		},
+		getProperties: function(){
+			return this;
+		}
+
+	}),
+	signal_remove: AFRAME.registerComponent('signal-remove', {
+		schema: {
+			on: {
+				type: 'string'
+			},
+			target: {
+				type: 'selector'
+			},
+			attr: {
+				type: 'string'
+			}
+		},
+		init: function () {
+			this.onPrescribedEvent = this.onPrescribedEvent.bind(this);
+		},
+		onPrescribedEvent: function(){
+			this.data.target.removeAttribute(this.data.attr);
+		}, 
+		update: function(old){
+			if (!old.on){
+				this.el.addEventListener(this.data.on, this.onPrescribedEvent);
+			} else {
+				this.el.removeEventListener(old.on, this.onPrescribedEvent);
+				this.el.addEventListener(this.data.on, this.onPrescribedEvent);
+			}
+		},
+		remove: function(){
+			this.el.removeEventListener(this.data.on, this.onPrescribedEvent);
+			this.onPrescribedEvent = null;
+		},
 	}),
 	grid_floor: AFRAME.registerComponent('grid-floor', {
 		init: function () {

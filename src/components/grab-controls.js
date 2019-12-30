@@ -1,6 +1,4 @@
 /*jshint esversion: 8*/
-
-
 module.exports = {
 	'collider-system': AFRAME.registerSystem('collider', {
 		schema: {
@@ -10,23 +8,17 @@ module.exports = {
 			}
 		},
 		init: function () {
-
 			this.colliders = [];
 			this.groups = {};
-
 			this.getIntersections = this.getIntersections.bind(this);
 			this.subscribe = this.subscribe.bind(this);
-
 			this.__testA = new THREE.Vector3();
 			this.__testB = new THREE.Vector3();
-
 			this.__step = 0;
 			this.__maxSteps = 0;
-
 			this.__distanceTest = Infinity;
 			this.__distanceNearest = Infinity;
 			this.__testedNearestEl = null;
-
 		},
 		subscribe: function (collider) {
 			this.colliders.push(collider);
@@ -36,40 +28,54 @@ module.exports = {
 			}
 			this.groups[collider.data.group].push(collider);
 		},
-		updateMembership: function () {
+		unsubscribe: function (collider) {
+			var index = this.colliders.indexOf(collider);
+			this.colliders.splice(index,1);
 
+			if (this.groups[collider.data.group]) {
+				index = this.groups[collider.data.group].indexOf(collider);
+				this.groups[collider.data.group].splice(index,1);
+			}
+			
+		},
+		updateMembership: function (collider, oldGroup, group) {
+			var index = this.groups[oldGroup].indexOf(collider);
+
+			if (index !==-1){
+				this.groups[oldGroup].splice(index,1);
+			}
+			if (!this.groups[group]){
+				this.groups[group]=[];
+			}
+			index = this.groups[group].indexOf(collider);
+
+			if (index ===-1){
+				this.groups[group].push(collider);
+			}
+			//if (index===-1)
 		},
 		getIntersections: function (collider, group, force) {
 			this.__maxSteps = this.groups[group].length;
-
 			this.__distanceTest = Infinity;
 			this.__distanceNearest = Infinity;
-
 			var intersectedEls = [];
 			var nearestEl = null;
-
 			if (force && force == true) {
 				collider.updateAABB();
 			}
-
 			for (this.__step = 0; this.__step < this.__maxSteps; this.__step++) {
 				if (force && force == true) {
 					this.groups[group][this.__step].updateAABB();
 				}
 				if (collider.AABB.intersectsBox(this.groups[group][this.__step].AABB) == true && this.groups[group][this.__step].data.enabled == true) {
-
 					intersectedEls.push(this.groups[group][this.__step].el);
-
 					collider.el.object3D.getWorldPosition(this.__testA);
-
 					this.groups[group][this.__step].el.object3D.getWorldPosition(this.__testB);
 					this.__distanceTest = this.__testA.distanceToSquared(this.__testB);
-
 					if (this.__distanceTest < this.__distanceNearest) {
 						this.__distanceNearest = this.__distanceTest;
 						nearestEl = this.groups[group][this.__step].el;
 					}
-
 				}
 			}
 			if (!nearestEl) {
@@ -81,7 +87,6 @@ module.exports = {
 				};
 			}
 		},
-
 	}),
 	'collider-component': AFRAME.registerComponent('collider', {
 		schema: {
@@ -97,13 +102,11 @@ module.exports = {
 				type: 'string',
 				default: 'none'
 			},
-
 			bounds: {
 				type: 'string',
 				default: 'auto',
 				oneOf: ['auto', 'proxy', 'box', 'mesh']
 			},
-
 			size: {
 				type: 'vec3',
 				default: {
@@ -112,39 +115,32 @@ module.exports = {
 					z: 0
 				}
 			},
-
 			static: {
 				type: 'boolean',
 				default: false
 			},
-
 			enabled: {
 				type: 'boolean',
 				default: true
 			},
-
+			autoRefresh: {
+				type: 'boolean',
+				default: false
+			},
 		},
 		init: function () {
+
 			this.AABB = new THREE.Box3();
-
-			this.onEntityLoaded = this.onEntityLoaded.bind(this);
-			this.onModelLoaded = this.onModelLoaded.bind(this);
-
 			this.createAABBFromAuto = this.createAABBFromAuto.bind(this);
 			this.createAABBFromMesh = this.createAABBFromMesh.bind(this);
 			this.createAABBFromProxy = this.createAABBFromProxy.bind(this);
 			this.createAABBFromBox = this.createAABBFromBox.bind(this);
-
-
-			this.onEntityLoaded = this.onEntityLoaded.bind(this);
-
 			this.getIntersections = this.getIntersections.bind(this);
 			this.updateIntersections = this.updateIntersections.bind(this);
 			this.addIntersection = this.addIntersection.bind(this);
 			this.removeIntersection = this.removeIntersection.bind(this);
 
-			//this.createAABBFromAuto = this.createAABB.auto.bind(this);
-
+			this.subscribe = this.subscribe.bind(this);
 
 			this.clearedEls = [];
 			this.intersectedEls = [];
@@ -154,15 +150,19 @@ module.exports = {
 			this.__distanceNearest = Infinity;
 			this.__intersections = [];
 			this.__intersectionsCleared = [];
-
 			this.__elapsed = 0;
-			//var component = this; //var objmap = component.el.object3DMap;
 
-			//console.log(moops);
-			//AFRAME.utils.entity.onLoad(this.el, this.onEntityLoaded, this);
+		},
+		subscribe: function(){
+			if (!this.subscribed){
+				this.system.subscribe(this);
+				this.subscribed = true;
+			}
 		},
 		update: function (oldData) {
-			if (!oldData.bounds) {
+			if (!oldData.bounds || oldData.bounds && oldData.bounds !== this.data.bounds)
+			
+			{
 				switch (this.data.bounds) {
 				case 'box':
 					this.createAABBFromBox();
@@ -179,24 +179,18 @@ module.exports = {
 					break;
 				}
 			}
-		},
-		onEntityLoaded: function (callback) {
-			AFRAME.utils.entity.onObject3DAdded(this.el, 'mesh', this.onModelLoaded, this, callback);
-		},
-		onModelLoaded: function (callback) {
-			callback();
+			if (oldData.group && oldData.group!==this.data.group){
+				this.system.updateMembership(this,oldData.group,this.data.group);
+			}
 		},
 		createAABBFromAuto: function () {
 			//console.log('auto');
 			this.AABB.setFromObject(this.el.object3DMap.mesh);
-
 			var size = new THREE.Vector3();
 			var center = new THREE.Vector3();
 			var positionWorld = new THREE.Vector3();
-
 			this.AABB.getSize(size);
 			this.AABB.getCenter(center);
-
 			this.el.object3D.getWorldPosition(positionWorld);
 			center.sub(positionWorld);
 			size.divide(this.el.object3D.scale);
@@ -207,24 +201,18 @@ module.exports = {
 			});
 
 			this.AABB.setFromObject(this.el.object3DMap.proxy);
-
 			var helper = new THREE.Box3Helper(this.AABB);
 			this.el.sceneEl.object3D.add(helper);
-
 			this.updateAABB = function () {
 				this.AABB.setFromObject(this.el.object3DMap.proxy);
 			};
-
 			this.updateAABB = this.updateAABB.bind(this);
-			this.system.subscribe(this);
-			this.subscribed = true;
+			this.subscribe();
 		},
 		createAABBFromBox: function () {
 			var positionWorld = new THREE.Vector3();
-
 			this.el.object3D.getWorldPosition(positionWorld);
 			this.AABB.setFromCenterAndSize(positionWorld, this.data.size);
-
 			var helper = new THREE.Box3Helper(this.AABB);
 			this.el.sceneEl.object3D.add(helper);
 
@@ -234,14 +222,14 @@ module.exports = {
 			};
 
 			this.updateAABB = this.updateAABB.bind(this);
-			this.system.subscribe(this);
-			this.subscribed = true;
+			this.subscribe();
 		},
+
 		createAABBFromProxy: function () {
-			//console.log('auto');
-			this.AABB.setFromObject(this.el.object3DMap.mesh);
 
 			this.AABB.setFromObject(this.el.object3DMap.proxy);
+			console.log(this.el.object3DMap);
+			console.log(this.el.object3DMap.proxy);
 
 			var helper = new THREE.Box3Helper(this.AABB);
 			this.el.sceneEl.object3D.add(helper);
@@ -251,11 +239,10 @@ module.exports = {
 			};
 
 			this.updateAABB = this.updateAABB.bind(this);
-			this.system.subscribe(this);
-			this.subscribed = true;
+			this.subscribe();
 		},
+
 		createAABBFromMesh: function () {
-			//console.log('auto');
 			this.AABB.setFromObject(this.el.object3DMap.mesh);
 
 			var size = new THREE.Vector3();
@@ -264,42 +251,30 @@ module.exports = {
 
 			this.AABB.getSize(size);
 			this.AABB.getCenter(center);
-
 			this.el.object3D.getWorldPosition(positionWorld);
+
 			center.sub(positionWorld);
 			size.divide(this.el.object3D.scale);
-
-
-			this.el.setAttribute('proxy', {
-				size: size,
-				offset: center
-			});
-
-
-			this.AABB.setFromObject(this.el.object3DMap.proxy);
 
 			var helper = new THREE.Box3Helper(this.AABB);
 			this.el.sceneEl.object3D.add(helper);
 
 			this.updateAABB = function () {
-				this.AABB.setFromObject(this.el.object3DMap.proxy);
+				this.AABB.setFromObject(this.el.object3DMap.mesh);
 			};
 
 			this.updateAABB = this.updateAABB.bind(this);
-			this.system.subscribe(this);
-			this.subscribed = true;
+			this.subscribe();
 		},
 		getIntersections: function (group, force) {
 			return this.system.getIntersections(this, group, force);
 		},
 		addIntersection: function (el) {
 			if (this.intersectedEls.indexOf(el) === -1) {
-
 				if (this.intersectedEls.length === 0 && !this.el.is('colliding')) {
 					this.el.addState('colliding');
 				}
 				this.intersectedEls.push(el);
-
 				this.el.emit('hitstart', {
 					el: el,
 					intersectedEls: this.intersectedEls,
@@ -310,15 +285,11 @@ module.exports = {
 					intersectedEls: this.intersectedEls
 				}, false);
 			}
-
 		},
 		removeIntersection: function (el) {
-
 			if (this.intersectedEls.indexOf(el) !== -1) {
-
 				var index = this.intersectedEls.indexOf(el);
 				this.intersectedEls.splice(index, 1);
-
 				this.el.emit('hitend', {
 					clearedEl: el,
 					intersectedEls: this.intersectedEls
@@ -327,57 +298,41 @@ module.exports = {
 					clearedEl: el,
 					intersectedEls: this.intersectedEls
 				}, false);
-
-
 			}
-
 			if (this.intersectedEls.length === 0 && this.el.is('colliding')) {
 				this.el.removeState('colliding');
 			}
-
 		},
 		updateIntersections: function () {
-
 			if (!this.system.groups[this.data.collidesWith]) return;
 			this.__distanceNearest = Infinity;
 			this.__distanceTest = 0;
-
 			this.__intersections.splice(0, this.__intersections.length);
 			this.__intersectionsCleared.splice(0, this.__intersectionsCleared.length);
-
 			this.__nearestEl = null;
-
 			this.__step = 0;
 			this.__stepMax = this.system.groups[this.data.collidesWith].length;
 			for (this.__step = 0; this.__step < this.__stepMax; this.__step++) {
 				if (this.system.groups[this.data.collidesWith][this.__step].data.enabled == true) {
 					if (this.AABB.intersectsBox(this.system.groups[this.data.collidesWith][this.__step].AABB) == true) {
-
 						this.el.object3D.getWorldPosition(this.system.__testA);
 						this.system.groups[this.data.collidesWith][this.__step].el.object3D.getWorldPosition(this.system.__testB);
-
 						this.__distanceTest = this.system.__testA.distanceToSquared(this.system.__testB);
-
 						if (this.__distanceTest < this.__distanceNearest) {
 							this.__distanceNearest = this.__distanceTest;
 							this.__nearestEl = this.system.groups[this.data.collidesWith][this.__step].el;
 						}
-
 						this.__intersections.push(this.system.groups[this.data.collidesWith][this.__step].el);
 					} else {
 						this.__intersectionsCleared.push(this.system.groups[this.data.collidesWith][this.__step].el);
-						//this.removeIntersection(this.system.groups[this.data.collidesWith][this.__step].el);
 					}
 				}
 			}
-
 			this.nearestEl = this.__nearestEl;
-
 			this.__stepMax = this.__intersections.length;
 			for (this.__step = 0; this.__step < this.__stepMax; this.__step++) {
 				this.addIntersection(this.__intersections[this.__step]);
 			}
-
 			this.__stepMax = this.__intersectionsCleared.length;
 			for (this.__step = 0; this.__step < this.__stepMax; this.__step++) {
 				this.removeIntersection(this.__intersectionsCleared[this.__step]);
@@ -394,10 +349,13 @@ module.exports = {
 			if (this.data.static !== true) {
 				this.updateAABB();
 			}
-
-			if (this.data.collidesWith !== 'none') {
+			if (this.data.autoRefresh === true) {
 				this.updateIntersections();
 			}
+		},
+		remove: function(){
+			this.system.unsubscribe(this);
+
 
 		}
 	}),
@@ -408,7 +366,6 @@ module.exports = {
 			default: new THREE.Vector3(0, 0, 0),
 		},
 		init: function () {
-
 		}
 	}),
 	'velocity-system': AFRAME.registerSystem('velocity', {
@@ -421,7 +378,6 @@ module.exports = {
 				type: 'boolean',
 				default: true
 			},
-
 		},
 	}),
 	'velocity': AFRAME.registerComponent('velocity', {
@@ -435,7 +391,6 @@ module.exports = {
 			this.__elapsed = 0;
 			this.WorldPosition = new THREE.Vector3();
 			this.WorldPositionLast = new THREE.Vector3();
-
 			this.step = new THREE.Vector3();
 			this.stepDelta = new THREE.Vector3();
 			this.stepNext = new THREE.Vector3();
@@ -456,35 +411,26 @@ module.exports = {
 					var size = new THREE.Vector3();
 					box.getSize(size);
 					this.speedometer.object3D.translateY((size.y / 2) + 0.1);
-
 				};
 				self.el.appendChild(this.speedometer);
 				self.speedometer.setAttribute('text', textConfig);
-
 				self.speedometer.updateText = function (msg) {
 					msg = String(msg);
 					self.speedometer.setAttribute('text', {
 						value: msg
 					});
 				};
-
 				//this.speedometer = speedometer;
 				AFRAME.utils.entity.onModel(this.el, putAbove, this);
 			}
 		},
 		tick: function (__t, dt) {
-
 			this.__elapsed += dt;
 			if (this.__elapsed < this.interval) return;
 			this.__elapsed = 0;
-
-
 			this.el.object3D.getWorldPosition(this.WorldPosition);
-
 			this.stepDelta.copy(this.WorldPosition).sub(this.WorldPositionLast);
-
 			this.data.copy(this.stepDelta);
-
 			if (this.speedometer) {
 				this.speedometer.updateText(
 					`x: ${this.data.x.toFixed(2)}, 
@@ -492,12 +438,8 @@ y: ${this.data.y.toFixed(2)},
 z: ${this.data.z.toFixed(2)}`
 				);
 			}
-
 			this.WorldPositionLast.copy(this.WorldPosition);
-
-
 		}
-
 	}),
 	'collider-proxy-system': AFRAME.registerSystem('proxy', {
 		schema: {
@@ -506,7 +448,6 @@ z: ${this.data.z.toFixed(2)}`
 				default: true
 			}
 		},
-
 		init: function () {
 			this.material = new THREE.MeshBasicMaterial({
 				wireframe: true,
@@ -549,15 +490,14 @@ z: ${this.data.z.toFixed(2)}`
 				this.data.size.z
 			);
 			this.proxy = new THREE.Mesh(this.geometry, this.system.material);
-
 			this.setRotation = this.setRotation.bind(this);
 			this.setPosition = this.setPosition.bind(this);
-
 			this.setRotation(this.data.orient);
 			this.setPosition(this.data.offset);
-
 			this.proxy.visible = this.system.data.debug;
 			this.el.setObject3D('proxy', this.proxy);
+			this.el.object3DMap.proxy.updateWorldMatrix(true,true);
+			this.el.object3DMap.proxy.updateMatrixWorld(true);
 		},
 		setPosition: function (vec3) {
 			this.proxy.position.set(
@@ -578,17 +518,14 @@ z: ${this.data.z.toFixed(2)}`
 		},
 		update: function (oldData) {
 			if (!oldData.size) return;
-
 			if (AFRAME.utils.deepEqual(oldData.size, this.data.size) == false) {
 				this.remove();
 				this.init();
 				//console.log('size updated');
 				return;
 			}
-
 			this.setRotation(this.data.orient);
 			this.setPosition(this.data.offset);
-
 		}
 	}),
 	'constraint': AFRAME.registerComponent('constraint', {
@@ -598,22 +535,16 @@ z: ${this.data.z.toFixed(2)}`
 			}
 		},
 		init: function () {
-
 			this.originalParent = this.el.object3D.parent;
-
 		},
 		update: function (oldData) {
-
 			if (!this.data.parent.object3DMap.constraint) {
 				this.data.parent.setObject3D('constraint', new THREE.Group());
 			}
-
 			this.data.parent.object3DMap.constraint.attach(this.el.object3D);
 			this.el.addState(this.data.parent);
-
 			if (oldData.parent && oldData.parent !== this.data.parent) {
 				//console.log('constraintchanged');
-
 				this.el.emit('constraintchanged', {
 					parent: this.data.parent,
 					el: this.el
@@ -622,12 +553,9 @@ z: ${this.data.z.toFixed(2)}`
 					parent: this.data.parent,
 					el: this.el
 				}, true);
-
 			}
-
 			if (!oldData.parent) {
 				//console.log(this.data.parent);
-
 				this.el.emit('constraintadded', {
 					parent: this.data.parent,
 					el: this.el
@@ -636,17 +564,12 @@ z: ${this.data.z.toFixed(2)}`
 					parent: this.data.parent,
 					el: this.el
 				}, true);
-
 			}
-
-
-
 		},
 		remove: function () {
 			//console.log('constraintremoved');
 			this.originalParent.attach(this.el.object3D);
 			this.el.removeState('constrained');
-
 			this.el.emit('constraintremoved', {
 				parent: this.data.parent,
 				el: this.el
@@ -656,116 +579,6 @@ z: ${this.data.z.toFixed(2)}`
 				el: this.el
 			}, false);
 		}
-	}),
-	old: {
-		/*aabb_lite_system: AFRAME.registerSystem('collider', {
-		schema: {
-		debug: { type: 'boolean', default: true },
-		},
-		init: function () {
-		var id = AFRAME.utils.makeId(8);
-		this.colliderSharedGroup = `aabb-${id}`;
-		this.boxMat = new THREE.MeshBasicMaterial({ wireframe: true });
-		
-		this.subscribe = this.subscribe.bind(this);
-		
-		this.unsubscribe = this.unsubscribe.bind(this);
-		
-		this._updateGroups = this._updateGroups.bind(this);
-		
-		this._refreshGroupAABBs = this._refreshGroupAABBs.bind(this);
-		
-		this._refreshObjects = this._refreshObjects.bind(this);
-		
-		this.AABBs = [];
-		
-		
-		
-		
-		},
-		subscribe: async function (component) {
-		this.AABBs.push(component);
-		this._refreshObjects();
-		},
-		unsubscribe: async function (component) {
-		var index = this.AABBs.indexOf(component);
-		this.AABBs.splice(index, 1);
-		this._refreshObjects();
-		},
-		_updateGroups: function (component) {
-		
-		},
-		_refreshGroupAABBs: function (group, force) {
-		
-		
-		},
-		_refreshObjects: async function () {
-		var j = this.AABBs.length;
-		for (var i = 0; i < j; i++) {
-		this.AABBs[i].setDirty(true);
-		}
-		},
-		update: function () {
-		
-		}
-		}),
-		aabb_lite: AFRAME.registerComponent('collider', {
-		schema: {
-		objects: { type: 'string' },
-		interval: { type: 'number', default: 40 },
-		
-		static: { type: 'boolean', default: true },
-		autoRefresh: { type: 'boolean', default: false },
-		
-		debug: { type: 'boolean', default: true },
-		
-		enabled: { type: 'boolean', default: false },
-		size: { type: 'vec3', default: { x: 0, y: 0, z: 0 } },
-		offset: { type: 'vec3', default: { x: 0, y: 0, z: 0 } },
-		orient: { type: 'vec3', default: { x: 0, y: 0, z: 0 } },
-		
-		bounds: { type: 'string', default: 'auto', oneOf: ['auto', 'size', 'proxy','mesh'] },
-		},
-		multiple: false,
-		init: function () {
-		this.el.hasAABB = null;
-		this.AABB = new THREE.Box3();
-		
-		var dirty = null;
-		this.dirty = function(){
-		return dirty;
-		};
-		
-		this.resetDirty = function(){
-		dirty = null;
-		};
-		this.setDirty = async function(){
-		dirty=true;
-		};
-		
-		this.refreshObjects = this.refreshObjects.bind(this);
-		
-		this.dirty = this.dirty.bind(this);
-		this.setDirty = this.setDirty.bind(this);
-		this.resetDirty = this.resetDirty.bind(this);
-		
-		this.objects = [];
-		this.intersectingEls = [];
-		this.nearestEl = null;
-		this.clearedEls = [];
-		},
-		refreshObjects: function(){
-		
-		},
-		update: function(oldData){
-		//if (!oldData.bounds) return;
-		switch (this.data.bounds){
-		
-		}
-		}
-		
-		
-		}),*/
-	},
-
+	})
+	
 };
