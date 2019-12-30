@@ -1,4 +1,4 @@
-# SuperQuest: Oculus Quest AFrame Components
+# *_SuperQuest!_* Oculus Quest AFrame Components
 
 ![image](https://www.repostatus.org/badges/latest/wip.svg) [![Documentation Status](https://readthedocs.org/projects/superquest/badge/?version=latest)](https://superquest.readthedocs.io/?badge=latest)
 
