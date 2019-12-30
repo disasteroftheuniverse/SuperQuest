@@ -1,9 +1,12 @@
 # **Extras Collection**
+
 <hr>
+
 A collection of miscellaneous components with varying degrees of usefulness.
 
-**rounded**
----
+# **rounded**
+
+<hr>
 
 Creates a flat 2D rectangle with rounded corners. The appearance can be modified with [A-Frame 'material' component](https://aframe.io/docs/master/components/material.html).
 
@@ -21,7 +24,9 @@ Creates a flat 2D rectangle with rounded corners. The appearance can be modified
 |  width | _number_  |  1  | The width of the rectangle. |
 |  height | _number_  |  1  | The height of the rectangle. |
 
-## **clamp**
+# **clamp**
+
+<hr>
 
 Restricts the movement of an object to a volume specified by minimum and maximum values in world space; Objects with the _clamp_ component cannot move beyond the limits defined by the min and max values.
 
@@ -38,7 +43,9 @@ Restricts the movement of an object to a volume specified by minimum and maximum
 |  min | _Vector3_  |  {x:-1,y:-1,z:-1}  | The minimum allowed world position by axis. |
 |  max | _Vector3_  |  {x:1,y:1,z:1}  | The maximum allowed world position by axis. |
 
-## **log-object3D**
+# **log-object3D**
+
+<hr>
 
 Calls `console.log` after a mesh is loaded;
 
@@ -49,7 +56,9 @@ Calls `console.log` after a mesh is loaded;
 <!-- returns 'Object3D: { .. etc ... }'-->
 ```
 
-## **billboard**
+# **billboard**
+
+<hr>
 
 Aligns the Z-axis of an entity to always face towards a specified entity;
 
