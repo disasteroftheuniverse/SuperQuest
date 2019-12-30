@@ -69,8 +69,7 @@ A simple AABB collision detection system
 **Example**
 
 ```html
-<a-entity 
-collider="
+<a-entity collider="
     interval: 40; 
 	 group: foo; 
 	 collidesWith: bar; 
