@@ -29,6 +29,7 @@ AFRAME.utils.extendComponent('oculus-quest-hands', 'grab', (grabEvent) => {/*you
 The appearance can be modified with [A-Frame 'material' component](https://aframe.io/docs/master/components/material.html).
 
 **Examples**
+
 ```html
 <!--     with url(path/to/asset);    -->
 <a-entity id="leftHand" 
@@ -48,6 +49,7 @@ The appearance can be modified with [A-Frame 'material' component](https://afram
 ```
 
 **Properties**
+
 | Property | Property Type | Default Value |  Description  |
 |---|---|---|---|
 |  model | _asset_ |  `./handRight.glb` | The path to the prescribed hand model in glb format. |
@@ -61,23 +63,6 @@ The appearance can be modified with [A-Frame 'material' component](https://afram
 
 Gestures are stored as animation targets in the [prescribed hand model](./assets.md). 
 
-Several poses are triggered by default controller events such as _triggertouchstart_ and _gripdown_. All gestures and poses may be triggered with the addition of a new state or by an event of type 'pose' with the detail of `{pose: 'posename'}`:
-```js
-var leftHandEl = document.querySelector('#leftHand');
-leftHandEl.emit('pose',{pose: 'hold-tennisball'});
-```
-
-**Available ready-made gestures**
-| Gesture | Event(s) | State |
-|---|---|---|
-|  fist | _gripdown_ |  fist |
-|  grab | _gripdown_ |  holding-something |
-|  hold-hammer | _grab_, _hold_ |  holding-hammer |
-|  hold-tennisball | _grab_, _hold_ |  holding-tennisball |
-|  hold-brick | _grab_, _hold_ |  holding-brick |
-|  hold-pistol | _grab_, _hold_ |  holding-pistol |
-|  hold-sword | _grab_, _hold_ |  holding-sword |
-
 ### Alignments
 
-The presribed hand model includes a number of transforms which assist in aligning objecst to different hand gestures when they are picked up. WHich alignment a grabbed item aligns to may be configured with the ['grabbable' component](#grabbable).
+The presribed hand model includes a number of transforms which assist in aligning objects to different hand gestures when they are picked up. Which alignment a grabbed item aligns to may be configured with the ['grabbable' component](#grabbable).
