@@ -646,3 +646,6 @@ module.exports = {
 
 
 };
+
+// git config --global user.name "Patrick Pineda"
+// git config --global user.email  "patrick@patrickpineda.net"
