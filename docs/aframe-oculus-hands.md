@@ -1,7 +1,5 @@
 # **Oculus Quest Hands**
 
-![image](https://imgur.com/UQ2pqAd.gif =150x150)
-
 A set of components meant to emulate the behavior and controls of the virtual hands as seen in the [First Steps](https://www.oculus.com/experiences/quest/1863547050392688) app for the [Oculus Quest](https://www.oculus.com/quest/).
 
 These components enable the ability to pick up, move and drop virtual items with the Oculus Touch controllers. This module includes all the components necessary to enable this functionality. 
