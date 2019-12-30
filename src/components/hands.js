@@ -1,10 +1,8 @@
 /*jshint esversion: 8*/
-//require('./quest-utils');
-//require('./common-components');
-//require('./aabb-lite');
+/*sourcetype:module */
 module.exports = {
 	'hand-system': AFRAME.registerSystem('oculus-quest-hands', {
-		init: function () { },
+		init: function () {},
 		subscribe: function () {
 
 		}
@@ -138,7 +136,7 @@ module.exports = {
 			this.eventHandlers[name] = this.eventHandlers[name].bind(this);
 			this.el.addEventListener(name, this.eventHandlers[name]);
 		},
-		grab: function () { },
+		grab: function () {},
 		registerEventListeners: function () {
 			var intersections = null;
 
@@ -233,7 +231,7 @@ module.exports = {
 				this.animateHand(this.determineFingerGesture('open'));
 			}
 		},
-		deregisterEventListeners: function () { },
+		deregisterEventListeners: function () {},
 		animateHand: function (pose) {
 			//console.log(pose);
 			if (!this.lastPose) {
