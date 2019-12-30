@@ -1,5 +1,5 @@
-site_name: MkLorum
+site_name: Superquest
 pages:
     - Home: index.md
-    - About: about.md
+    - Components: components.md
 theme: readthedocs
