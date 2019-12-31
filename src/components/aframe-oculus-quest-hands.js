@@ -129,7 +129,10 @@ module.exports = {
 			this.registerEventListeners();
 
 			this.el.setAttribute('collider', {
-				group: 'hands'
+				group: 'hands',
+				autoRefresh: true,
+				static: false,
+				interval: 10
 			});
 			this.collider = this.el.components.collider;
 		},
@@ -170,7 +173,7 @@ module.exports = {
 
 					if (this.holdingEl.components.grabbable)
 					{
-						this.holdingEl.components.grabbable.onGrab(this);
+						this.holdingEl.components.grabbable.grab(this);
 					} 
 
 				} else {
@@ -183,12 +186,22 @@ module.exports = {
 				if (this.el.is('holding-something')) {
 					this.holdingEl.removeAttribute('constraint');
 					this.el.removeState('holding-something');
+					
+
+					if (this.holdingEl.components.grabbable)
+					{
+						this.holdingEl.components.grabbable.release(this);
+					} 
+
 					this.holdingEl = null;
 				}
 
 				if (this.el.is('gripping')) {
 					this.el.removeState('gripping');
 				}
+
+
+
 
 				this.setDirty();
 			});
@@ -316,14 +329,19 @@ module.exports = {
 
 		},
 		updateMembership: function (collider, oldGroup, group) {
-			var index = this.groups[oldGroup].indexOf(collider);
+			var index;
 
-			if (index !== -1) {
-				this.groups[oldGroup].splice(index, 1);
+			if (this.groups[oldGroup]){
+				index = this.groups[oldGroup].indexOf(collider);
+				if (index !== -1) {
+					this.groups[oldGroup].splice(index, 1);
+				}
 			}
+
 			if (!this.groups[group]) {
 				this.groups[group] = [];
 			}
+
 			index = this.groups[group].indexOf(collider);
 
 			if (index === -1) {
@@ -862,28 +880,39 @@ z: ${this.data.z.toFixed(2)}`
 		}
 	}),
 	'grabbable': AFRAME.registerComponent('grabbable', {
+		dependencies:['collider'],
 		schema: {
+			enabled: {type: 'boolean', default: true},
 
 		},
 		init: function () {
 			this.onColliderReady = this.onColliderReady.bind(this);
-			this.onGrab = this.onGrab.bind(this);
+			this.grab = this.grab.bind(this);
+			this.release = this.release.bind(this);
 
-			if (this.el.components.collider && this.el.components.collider.subscribed)	{
-				this.onColliderReady();
-			} else {
-				this.el.addEventListener('colliderready', this.onColliderReady,{once: true});
-			}		
+			this.originalColliderProperties = JSON.parse(JSON.stringify(AFRAME.utils.entity.getComponentProperty(this.el,'collider')));
+			this.originalColliderProperties.group='grabbable';
+
+			if (this.originalColliderProperties.bounds){
+				delete this.originalColliderProperties.bounds;
+			}
+			//console.log(this.originalColliderProperties);
+	
 		},
 		onColliderReady: function(){
-			this.originalColliderProperties = AFRAME.utils.entity.getComponentProperty(this.el,'collider');
-			console.log(this.originalColliderProperties);
-		},
-		onGrab: function(hand){
 
 		},
-		update: function () {
-
+		grab: function(hand){
+			this.el.setAttribute('collider',{autoRefresh: false, static: false, interval: 20});
+			//console.log(JSON.parse(JSON.stringify(AFRAME.utils.entity.getComponentProperty(this.el,'collider'))));
+		},
+		release: function(hand){
+			this.el.setAttribute('collider',this.originalColliderProperties);
+			//console.log(JSON.parse(JSON.stringify(AFRAME.utils.entity.getComponentProperty(this.el,'collider'))));
+		},
+		update: function (oldData) {
+			this.el.setAttribute('collider','group','grabbable');
+			//console.log(JSON.parse(JSON.stringify(AFRAME.utils.entity.getComponentProperty(this.el,'collider'))));
 		},
 		remove: function () {
 
