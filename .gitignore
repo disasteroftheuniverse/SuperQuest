@@ -7,4 +7,4 @@ SuperQuest.code-workspace
 *src/assets/hands_demo_animation.mb
 *hands_demo_animation.mb*
 *push.sh*
-components/old*
+src/components/old*
