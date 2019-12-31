@@ -154,10 +154,23 @@ module.exports = {
 				intersections = this.collider.getIntersections('grabbable', true);
 				if (intersections) {
 					this.holdingEl = intersections.nearestEl;
+
 					this.holdingEl.setAttribute('constraint', {
 						parent: this.el
 					});
-					this.el.addState('holding-something');
+
+					if (!this.el.is('holding-something'))
+					{
+						this.el.addState('holding-something');
+						this.holdingEl.emit('grabbed',{handEl: this.el, hand: this.data.hand});
+						this.el.emit('grab',{holdingEl: this.holdingEl});
+					}
+
+					if (this.holdingEl.components.grabbable)
+					{
+						this.holdingEl.components.grabbable.onGrab(this);
+					}
+
 				} else {
 					this.el.addState('gripping');
 				}
@@ -419,6 +432,7 @@ module.exports = {
 			if (!this.subscribed) {
 				this.system.subscribe(this);
 				this.subscribed = true;
+				this.el.emit('colliderready',{el: this.el, collider: this},false);
 			}
 		},
 		update: function (oldData) {
@@ -490,8 +504,8 @@ module.exports = {
 		createAABBFromProxy: function () {
 
 			this.AABB.setFromObject(this.el.object3DMap.proxy);
-			console.log(this.el.object3DMap);
-			console.log(this.el.object3DMap.proxy);
+			//console.log(this.el.object3DMap);
+			//console.log(this.el.object3DMap.proxy);
 
 			var helper = new THREE.Box3Helper(this.AABB);
 			this.el.sceneEl.object3D.add(helper);
@@ -544,7 +558,7 @@ module.exports = {
 				}, false);
 				el.emit('hitstart', {
 					el: el,
-					intersectedEls: this.intersectedEls
+					//intersectedEls: this.intersectedEls
 				}, false);
 			}
 		},
@@ -617,6 +631,10 @@ module.exports = {
 		},
 		remove: function () {
 			this.system.unsubscribe(this);
+
+			if (this.data.bounds=='auto' && this.el.object3DMap.proxy){
+				this.el.removeAttribute('proxy');
+			}
 
 
 		}
@@ -839,6 +857,33 @@ z: ${this.data.z.toFixed(2)}`
 				parent: this.data.parent,
 				el: this.el
 			}, false);
+		}
+	}),
+	'grabbable': AFRAME.registerComponent('grabbable', {
+		schema: {
+
+		},
+		init: function () {
+			this.onColliderReady = this.onColliderReady.bind(this);
+			this.onGrab = this.onGrab.bind(this);
+
+			if (this.el.components.collider && this.el.components.collider.subscribed)	{
+				this.onColliderReady();
+			} else {
+				this.el.addEventListener('colliderready', this.onColliderReady,{once: true});
+			}		
+		},
+		onColliderReady: function(){
+			this.originalColliderProperties = AFRAME.utils.getComponentProperty();
+		},
+		onGrab: function(hand){
+
+		},
+		update: function () {
+
+		},
+		remove: function () {
+
 		}
 	})
 };
