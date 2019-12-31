@@ -169,7 +169,7 @@ module.exports = {
 					if (this.holdingEl.components.grabbable)
 					{
 						this.holdingEl.components.grabbable.onGrab(this);
-					}
+					} 
 
 				} else {
 					this.el.addState('gripping');
