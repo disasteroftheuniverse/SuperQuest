@@ -1,3 +1,5 @@
-docs/ linguist-documentation=true
+*.js linguist-language=JavaScript
+docs/* linguist-documentation=true
+*.js linguist-detectable=true
 *.yml linguist-detectable=false
 *.md linguist-detectable=false
