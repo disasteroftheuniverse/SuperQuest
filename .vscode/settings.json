@@ -1,5 +1,0 @@
-{
-	"eslint.format.enable": true,
-	"eslint.enable": false,
-	"git.postCommitCommand": "push"
-}
