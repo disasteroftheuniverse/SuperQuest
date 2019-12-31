@@ -4,7 +4,8 @@
   "description": "A collection of AFRAME components tailored for use with the Oculus Quest mobile virtual reality headset.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+	 "test": "echo \"Error: no test specified\" && exit 1",
+	 "push": "git push https://disasteroftheuniverse:13WrongTrousers!@github.com/disasteroftheuniverse/SuperQuest.git"
   },
   "keywords": [
     "aframe",
