@@ -1,0 +1,3 @@
+linguist-language=JavaScript
+*.js linguist-language=JavaScript
+docs/ linguist-documentation=true

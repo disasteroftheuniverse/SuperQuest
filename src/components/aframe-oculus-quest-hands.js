@@ -1,5 +1,7 @@
 /*jshint esversion: 8*/
 /*sourcetype:module */
+
+//require('aframe');
 module.exports = {
 	'hand-system': AFRAME.registerSystem('oculus-quest-hands', {
 		init: function () {},
@@ -874,7 +876,8 @@ z: ${this.data.z.toFixed(2)}`
 			}		
 		},
 		onColliderReady: function(){
-			this.originalColliderProperties = AFRAME.utils.getComponentProperty();
+			this.originalColliderProperties = AFRAME.utils.entity.getComponentProperty(this.el,'collider');
+			console.log(this.originalColliderProperties);
 		},
 		onGrab: function(hand){
 
