@@ -11,3 +11,6 @@ src/components/old
 src/components/old/
 ignore
 .vscode/*
+*.vscode*
+*bundle.sh*
+*.LICENSE*
