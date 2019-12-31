@@ -1,1 +1,3 @@
 docs/ linguist-documentation=true
+*.yml linguist-detectable=false
+*.md linguist-detectable=false

@@ -10,4 +10,4 @@ SuperQuest.code-workspace
 src/components/old
 src/components/old/
 ignore
-.vscode
+.vscode/*
