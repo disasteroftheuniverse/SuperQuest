@@ -11,7 +11,7 @@ _\ | |_| | |_) |  __| | / \_/ /| |_| |  __\__ | |_
 ├── <b>assets</b>/
 │   ├── hands.ma
 │   └── hands.fbx
-├── <b>components</b>/ <a href="https://www.repostatus.org/#wip"><img src="https://www.repostatus.org/badges/latest/wip.svg" width="32" alt="Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public." /></a>
+├── <b>components</b>/ <a href="https://www.repostatus.org/#wip"><img src="https://www.repostatus.org/badges/latest/wip.svg" width="48" alt="Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public." /></a>
 │   ├── superquest-extras-collection.js
 │   ├── superquest-google-poly.js
 │   ├── superquest-hands.js
@@ -19,8 +19,7 @@ _\ | |_| | |_) |  __| | / \_/ /| |_| |  __\__ | |_
 │   ├── superquest-shader-extras.js
 │   ├── superquest-utils.js
 │   └── superquest-teleporter-controls.js
-└── <b>physics</b>/ <a href="https://www.repostatus.org/#concept"><img src="https://www.repostatus.org/badges/latest/concept.svg" width="32" alt="Project Status: Concept – Minimal or no implementation has been done yet, or the repository is only intended to be a limited example, demo, or proof-of-concept." /></a>
-
+└── <b>physics</b>/ <a href="https://www.repostatus.org/#concept"><img src="https://www.repostatus.org/badges/latest/concept.svg" width="48" alt="Project Status: Concept – Minimal or no implementation has been done yet, or the repository is only intended to be a limited example, demo, or proof-of-concept." /></a>
     ├── superquest-physics-lite.js
     └── superquest-physics-lite.worker.js
 </pre>
