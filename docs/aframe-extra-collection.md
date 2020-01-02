@@ -49,21 +49,6 @@ Restricts the movement of an object to a volume specified by minimum and maximum
 
 <hr>
 
-## **log-object3D**
-
-<hr>
-
-Calls `console.log` after a mesh is loaded;
-
-**Example**
-
-```html
-<a-entity log-object3D></a-entity>
-<!-- returns 'Object3D: { .. etc ... }'-->
-```
-
-<hr>
-
 ## **billboard**
 
 <hr>

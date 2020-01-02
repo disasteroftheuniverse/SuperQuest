@@ -19,7 +19,7 @@ Support may eventually be added for [Oculus Hand Tracking](https://www.oculus.co
 
 A wrapper for [oculus-touch-controls](https://aframe.io/docs/master/components/oculus-touch-controls.html) that adds additional events, methods and a [prescribed hand model](./assets.md). This model supports a range of pre-animated poses and gestures to accommodate common gestures a user might make in VR.
 
-The appearance can be modified with [A-Frame 'material' component](https://aframe.io/docs/master/components/material.html).
+The appearance can be modified with ['material' component](https://aframe.io/docs/master/components/material.html).
 
 **Examples**
 
@@ -46,11 +46,10 @@ The appearance can be modified with [A-Frame 'material' component](https://afram
 | Property | Property Type | Default Value |  Description  |
 |---|---|---|---|
 |  model | _asset_ |  `./handRight.glb` | The path to the prescribed hand model in glb format. |
-|  hand | _string_  |  'right'  | The hand this entity represents. Can be one of 'right' or 'left' |
+|  hand | _string_  |  `right`  | The hand this entity represents. Can be one of 'right' or 'left' |
 |  camera | _selector_  |  `null`  | The height of the rectangle. |
 |  debug | _boolean_  |  `false`  | Show debug information and log all events to console. |
 
-<hr>
 
 ### Gestures
 
@@ -58,20 +57,21 @@ Gestures are stored as animation targets in the [prescribed hand model](./assets
 
 ### Alignments
 
-The presribed hand model includes a number of transforms which assist in aligning objects to different hand gestures when they are picked up. Which alignment a grabbed item aligns to may be configured with the ['grabbable' component](#grabbable).
+The presribed hand model includes a number of transforms which assist in aligning objects to different hand gestures when they are picked up. Which alignment a grabbed item aligns to may be configured with the ['grabbable' component](##grabbable).
+
+<hr>
 
 ## **collider**
 
 <hr>
 
-A simple AABB collision detection system
+A simple AABB collision detection system.
 
 **Example**
 
 ```html
 <a-entity collider="
     interval: 40; 
-	 group: foo; 
 	 collidesWith: bar; 
 	 bounds: auto; 
 	 size: 0 0 0;
@@ -86,12 +86,11 @@ A simple AABB collision detection system
 | Property | Property Type | Default Value |  Description  |
 |---|---|---|---|
 |  interval | _number_ |  40 | number of miliseconds between bounds updates & collision tests.  |
-|  group | _string_  |  'all'  | A group that this entity belongs to. Used to filter collisions. |
-|  collidesWith | _string_  |  'none'  | A group that this entity considers for collisions if autoRefresh is `true`. |
-|  bounds | _string_  |  'auto'  | How the boundaries of the AABB are computed. Can be one of `auto`,`proxy`,`box` or `mesh` |
-|  static | _booean_  |  true  | Whether or not to update the bounds and position on each interval |
-|  enabled | _booean_  |  true  | Whether this entity should be by other collider components. |
-|  autoRefresh | _booean_  |  false  | Whether or not this entity should check for intersections on each interval. |
+|  collidesWith | _string_  |  'none'  | A group that this entity considers for collisions if autoRefresh is `true`. Group membership is determined by the [group](##grp) component. |
+|  bounds | _string_  |  `auto`  | How the boundaries of the AABB are computed. Can be one of `auto`,`proxy`,`box` or `mesh`. |
+|  static | _boolean_  |  `true`  | Whether or not to update the bounds and position on each interval. |
+|  enabled | _boolean_  |  `true`  | Whether this entity should be by other collider components. |
+|  autoRefresh | _boolean_  |  `false`  | Whether or not this entity should check for intersections on each interval. |
 
 **Bounds**
 
@@ -99,7 +98,7 @@ A simple AABB collision detection system
 |---|---|
 |  _auto_ | Requires a 3D model component. Creates a proxy object whose bounds are fit to the bounding volume of a _mesh_. The AABB is computed from the proxy object. |
 |  _proxy_ | Requires the `proxy` component. The AABB is computed from the proxy object. |
-|  _box_ | The AABB is computed from the `size` property, where the size represents the extents of `'size: width depth height;'` |
+|  _box_ | The AABB is computed from the `size` property where size is the desired width, depth and height of the bounding volume. |
 |  _mesh_ | Requires a 3D model component. The AABB is computed from a mesh. |
 
 **Events**
@@ -115,7 +114,7 @@ A simple AABB collision detection system
 
 <hr>
 
-Attaches one entity to another using `THREE.Object3D.attach()`.
+Attaches one entity to another using `THREE.Object3D.attach()`. Removing this attribute restores the entity to its original parent. Used by [oculus-quest-hands](##oculus-quest-hands) to pick up and hold objects. This component is _not_ a dynamic constraint. 
 
 **Example**
 
@@ -129,3 +128,17 @@ Attaches one entity to another using `THREE.Object3D.attach()`.
 | Property | Property Type | Default Value |  Description  |
 |---|---|---|---|
 |  parent | _selector_ |  `null` | Another entity to attach this one to. May not be the same entity.  |
+
+<hr>
+
+## **grp**
+
+<hr>
+
+A utility for grouping and selecting entities which does not use DOM query methods. Used by collider, grabbable, draggable, droppable and pokeable components to select and filter other collidable objects. A group is defined by `grp__<NAME_OF_GROUP>`. Use `var id = 'foo'; <a-entity>.setAttribute('grp__${id})` to add an entity to a group, and use `<a-entity grp__foo>.removeAttribute('grp__${id})` to remove an entity from a group. 
+
+**Example**
+
+```html
+<a-entity grp__foo grp__bar></a-entity>
+```
