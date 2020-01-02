@@ -3,12 +3,7 @@
 
 //require('aframe');
 module.exports = {
-	'hand-system': AFRAME.registerSystem('oculus-quest-hands', {
-		init: function () {},
-		subscribe: function () {
 
-		}
-	}),
 	'hand': AFRAME.registerComponent('oculus-quest-hands', {
 		schema: {
 			camera: {
@@ -25,6 +20,8 @@ module.exports = {
 			}
 		},
 		init: function () {
+			this.el.setAttribute('grp__hands', '');
+			this.el.setAttribute(`grp__hand${this.data.hand}`, '');
 
 			this.setOtherHand = function (otherEl) {
 				this.otherHandEl = otherEl;
@@ -34,7 +31,7 @@ module.exports = {
 
 			this.el.setAttribute('tracked-controls', {
 				hand: this.data.hand,
-				//headElement: this.data.camera,
+				headElement: this.data.camera,
 				armModel: true,
 				autoHide: true,
 			});
@@ -80,7 +77,11 @@ module.exports = {
 			this.el.object3DMap.mesh.actions[animation.name] = this.handMesh.mixer.clipAction(this.el.object3DMap.mesh.clips[animation.name]);
 			Object.assign(this.el.object3DMap.mesh.actions[animation.name], this.animationConfig);
 		},
-		onEntityLoaded: function () {
+		onController: function () {
+
+			//this.onController();
+
+			/*
 			var controller = this.el.getAttribute('tracked-controls');
 			//console.log(controller);
 			if (controller.controller === -1) {
@@ -89,9 +90,9 @@ module.exports = {
 				});
 			} else {
 				this.onController();
-			}
+			}*/
 		},
-		onController: function () {
+		onEntityLoaded: function () {
 			var loader = new THREE.GLTFLoader();
 			var data = this.data;
 			var self = this;
@@ -129,7 +130,7 @@ module.exports = {
 			this.registerEventListeners();
 
 			this.el.setAttribute('collider', {
-				group: 'hands',
+				//group: 'hands',
 				autoRefresh: true,
 				static: false,
 				interval: 10
@@ -164,17 +165,20 @@ module.exports = {
 						parent: this.el
 					});
 
-					if (!this.el.is('holding-something'))
-					{
+					if (!this.el.is('holding-something')) {
 						this.el.addState('holding-something');
-						this.holdingEl.emit('grabbed',{handEl: this.el, hand: this.data.hand});
-						this.el.emit('grab',{holdingEl: this.holdingEl});
+						this.holdingEl.emit('grabbed', {
+							handEl: this.el,
+							hand: this.data.hand
+						});
+						this.el.emit('grab', {
+							holdingEl: this.holdingEl
+						});
 					}
 
-					if (this.holdingEl.components.grabbable)
-					{
+					if (this.holdingEl.components.grabbable) {
 						this.holdingEl.components.grabbable.grab(this);
-					} 
+					}
 
 				} else {
 					this.el.addState('gripping');
@@ -186,12 +190,11 @@ module.exports = {
 				if (this.el.is('holding-something')) {
 					this.holdingEl.removeAttribute('constraint');
 					this.el.removeState('holding-something');
-					
 
-					if (this.holdingEl.components.grabbable)
-					{
+
+					if (this.holdingEl.components.grabbable) {
 						this.holdingEl.components.grabbable.release(this);
-					} 
+					}
 
 					this.holdingEl = null;
 				}
@@ -277,7 +280,7 @@ module.exports = {
 			this.el.object3DMap.mesh.actions[pose].time = 0;
 			this.el.object3DMap.mesh.actions[this.lastPose].weight = 0;
 			this.el.object3DMap.mesh.actions[this.lastPose].play();
-			this.el.object3DMap.mesh.actions[this.lastPose].crossFadeTo(this.el.object3DMap.mesh.actions[pose], 0.075, false);
+			this.el.object3DMap.mesh.actions[this.lastPose].crossFadeTo(this.el.object3DMap.mesh.actions[pose], 0.11, true);
 			this.lastPose = pose;
 		},
 		tick: function (__time, delta) {
@@ -290,96 +293,94 @@ module.exports = {
 			}
 		}
 	}),
+	'group-system': AFRAME.registerSystem('grp', {
+		init: async function () {
+			var members = [];
+			var groups = new Map();
+
+			groups.set('hands', [])
+				.set('grabbable', [])
+				.set('hoverable', [])
+				.set('droppable', [])
+				.set('draggable', [])
+				.set('empty', [])
+				.set('all', []);
+
+			this.subscribe = async function (member) {
+				var index, group;
+				index = members.indexOf(member.el);
+				if (index === -1) {
+					members.push(member.el);
+				}
+				if (!groups.has(member.id)) {
+					groups.set(member.id, []);
+				}
+				group = groups.get(member.id);
+				index = group.indexOf(member.el);
+				if (index === -1) {
+					group.push(member.el);
+				}
+				console.log(groups);
+
+			};
+			this.subscribe = this.subscribe.bind(this);
+
+			this.unsubscribe = async function (member) {
+				var index, group;
+				index = members.indexOf(member.el);
+				if (index === -1) {
+					console.log('not a member');
+					return;
+				}
+				if (!groups.has(member.id)) {
+					console.log('group does not exist');
+					return;
+				}
+				group = groups.get(member.id);
+				index = group.indexOf(member.el);
+				if (index === -1) {
+					console.log('not a member of group');
+					return;
+				}
+				group.splice(index, 1);
+				console.log(groups);
+			};
+			this.unsubscribe = this.unsubscribe.bind(this);
+
+			this.getGroup = function (group) {
+				//console.log()
+				if (!groups.has(group)) return groups.get('empty');
+				return groups.get(group);
+			};
+
+			this.getGroup = this.getGroup.bind(this);
+
+			this.hasGroup = function (group) {
+				return (groups.has(group) == true) ? true : null;
+			};
+
+			this.hasGroup = this.hasGroup.bind(this);
+
+
+
+		}
+	}),
+	'group': AFRAME.registerComponent('grp', {
+		multiple: true,
+		init: async function () {
+			if (!this.id) return;
+			this.system.subscribe(this);
+		},
+		remove: async function () {
+			if (!this.id) return;
+			this.system.unsubscribe(this);
+		}
+	}),
 	'collider-system': AFRAME.registerSystem('collider', {
 		schema: {
 			debug: {
 				type: 'boolean',
 				default: true
-			}
-		},
-		init: function () {
-			this.colliders = [];
-			this.groups = {};
-			this.getIntersections = this.getIntersections.bind(this);
-			this.subscribe = this.subscribe.bind(this);
-			this.__testA = new THREE.Vector3();
-			this.__testB = new THREE.Vector3();
-			this.__step = 0;
-			this.__maxSteps = 0;
-			this.__distanceTest = Infinity;
-			this.__distanceNearest = Infinity;
-			this.__testedNearestEl = null;
-		},
-		subscribe: function (collider) {
-			this.colliders.push(collider);
-
-			if (!this.groups[collider.data.group]) {
-				this.groups[collider.data.group] = [];
-			}
-			this.groups[collider.data.group].push(collider);
-		},
-		unsubscribe: function (collider) {
-			var index = this.colliders.indexOf(collider);
-			this.colliders.splice(index, 1);
-
-			if (this.groups[collider.data.group]) {
-				index = this.groups[collider.data.group].indexOf(collider);
-				this.groups[collider.data.group].splice(index, 1);
-			}
-
-		},
-		updateMembership: function (collider, oldGroup, group) {
-			var index;
-
-			if (this.groups[oldGroup]){
-				index = this.groups[oldGroup].indexOf(collider);
-				if (index !== -1) {
-					this.groups[oldGroup].splice(index, 1);
-				}
-			}
-
-			if (!this.groups[group]) {
-				this.groups[group] = [];
-			}
-
-			index = this.groups[group].indexOf(collider);
-
-			if (index === -1) {
-				this.groups[group].push(collider);
-			}
-			//if (index===-1)
-		},
-		getIntersections: function (collider, group, force) {
-			this.__maxSteps = this.groups[group].length;
-			this.__distanceTest = Infinity;
-			this.__distanceNearest = Infinity;
-			var intersectedEls = [];
-			var nearestEl = null;
-			if (force && force == true) {
-				collider.updateAABB();
-			}
-			for (this.__step = 0; this.__step < this.__maxSteps; this.__step++) {
-				if (force && force == true) {
-					this.groups[group][this.__step].updateAABB();
-				}
-				if (collider.AABB.intersectsBox(this.groups[group][this.__step].AABB) == true && this.groups[group][this.__step].data.enabled == true) {
-					intersectedEls.push(this.groups[group][this.__step].el);
-					collider.el.object3D.getWorldPosition(this.__testA);
-					this.groups[group][this.__step].el.object3D.getWorldPosition(this.__testB);
-					this.__distanceTest = this.__testA.distanceToSquared(this.__testB);
-					if (this.__distanceTest < this.__distanceNearest) {
-						this.__distanceNearest = this.__distanceTest;
-						nearestEl = this.groups[group][this.__step].el;
-					}
-				}
-			}
-			if (!nearestEl) {
-				return null;
-			} else {
-				return {
-					intersectedEls: intersectedEls,
-					nearestEl: nearestEl
-				};
 			}
 		},
 	}),
@@ -388,10 +389,6 @@ module.exports = {
 			interval: {
 				type: 'number',
 				default: 40
-			},
-			group: {
-				type: 'string',
-				default: 'all'
 			},
 			collidesWith: {
 				type: 'string',
@@ -424,6 +421,11 @@ module.exports = {
 			},
 		},
 		init: function () {
+			this.el.setAttribute('grp__colliders', '');
+			this.groupManager = this.el.sceneEl.systems.grp;
+
+			this.__testA = new THREE.Vector3();
+			this.__testB = new THREE.Vector3();
 
 			this.AABB = new THREE.Box3();
 			this.createAABBFromAuto = this.createAABBFromAuto.bind(this);
@@ -450,9 +452,12 @@ module.exports = {
 		},
 		subscribe: function () {
 			if (!this.subscribed) {
-				this.system.subscribe(this);
+				//this.system.subscribe(this);
 				this.subscribed = true;
-				this.el.emit('colliderready',{el: this.el, collider: this},false);
+				this.el.emit('colliderready', {
+					el: this.el,
+					collider: this
+				}, false);
 			}
 		},
 		update: function (oldData) {
@@ -460,24 +465,26 @@ module.exports = {
 
 			{
 				switch (this.data.bounds) {
-				case 'box':
-					this.createAABBFromBox();
-					break;
-				case 'proxy':
-					AFRAME.utils.entity.onObject3DAdded(this.el, 'proxy', this.createAABBFromProxy, this);
-					break;
-				case 'mesh':
-					AFRAME.utils.entity.onModel(this.el, this.createAABBFromMesh, this);
-					break;
-				case 'auto':
-				default:
-					AFRAME.utils.entity.onModel(this.el, this.createAABBFromAuto, this);
-					break;
+					case 'box':
+						this.createAABBFromBox();
+						break;
+					case 'proxy':
+						AFRAME.utils.entity.onObject3DAdded(this.el, 'proxy', this.createAABBFromProxy, this);
+						break;
+					case 'mesh':
+						AFRAME.utils.entity.onModel(this.el, this.createAABBFromMesh, this);
+						break;
+					case 'auto':
+					default:
+						AFRAME.utils.entity.onModel(this.el, this.createAABBFromAuto, this);
+						break;
 				}
 			}
+
+			/*
 			if (oldData.group && oldData.group !== this.data.group) {
 				this.system.updateMembership(this, oldData.group, this.data.group);
-			}
+			}*/
 		},
 		createAABBFromAuto: function () {
 			//console.log('auto');
@@ -520,7 +527,6 @@ module.exports = {
 			this.updateAABB = this.updateAABB.bind(this);
 			this.subscribe();
 		},
-
 		createAABBFromProxy: function () {
 
 			this.AABB.setFromObject(this.el.object3DMap.proxy);
@@ -537,7 +543,6 @@ module.exports = {
 			this.updateAABB = this.updateAABB.bind(this);
 			this.subscribe();
 		},
-
 		createAABBFromMesh: function () {
 			this.AABB.setFromObject(this.el.object3DMap.mesh);
 
@@ -563,7 +568,45 @@ module.exports = {
 			this.subscribe();
 		},
 		getIntersections: function (group, force) {
-			return this.system.getIntersections(this, group, force);
+			var collideGroup = this.groupManager.getGroup(group);
+			var maxSteps = collideGroup.length;
+
+			if (maxSteps < 1) return null;
+
+			if (force && force == true) {
+				this.updateAABB();
+			}
+
+			var distanceTest = Infinity;
+			var distanceNearest = Infinity;
+			var intersectedEls = [];
+			var nearestEl = null;
+			var collider;
+
+			for (var step = 0; step < maxSteps; step++) {
+				collider = collideGroup[step].components.collider;
+				if (force && force == true) {
+					collider.updateAABB();
+				}
+				if (this.AABB.intersectsBox(collider.AABB) == true && collider.data.enabled == true) {
+					intersectedEls.push(collider.el);
+					this.el.object3D.getWorldPosition(this.__testA);
+					collider.el.object3D.getWorldPosition(this.__testB);
+					distanceTest = this.__testA.distanceToSquared(this.__testB);
+					if (distanceTest < distanceNearest) {
+						distanceNearest = distanceTest;
+						nearestEl = collider.el;
+					}
+				}
+			}
+			if (!nearestEl) {
+				return null;
+			} else {
+				return {
+					intersectedEls: intersectedEls,
+					nearestEl: nearestEl
+				};
+			}
 		},
 		addIntersection: function (el) {
 			if (this.intersectedEls.indexOf(el) === -1) {
@@ -578,7 +621,6 @@ module.exports = {
 				}, false);
 				el.emit('hitstart', {
 					el: el,
-					//intersectedEls: this.intersectedEls
 				}, false);
 			}
 		},
@@ -600,32 +642,41 @@ module.exports = {
 			}
 		},
 		updateIntersections: function () {
-			if (!this.system.groups[this.data.collidesWith]) return;
+			var collideGroup = this.groupManager.getGroup(this.data.collidesWith);
+			this.__stepMax = collideGroup.length;
+
+			if (this.__stepMax < 1) return;
+
 			this.__distanceNearest = Infinity;
 			this.__distanceTest = 0;
 			this.__intersections.splice(0, this.__intersections.length);
 			this.__intersectionsCleared.splice(0, this.__intersectionsCleared.length);
 			this.__nearestEl = null;
 			this.__step = 0;
-			this.__stepMax = this.system.groups[this.data.collidesWith].length;
+
+			var collider;
+
 			for (this.__step = 0; this.__step < this.__stepMax; this.__step++) {
-				if (this.system.groups[this.data.collidesWith][this.__step].data.enabled == true) {
-					if (this.AABB.intersectsBox(this.system.groups[this.data.collidesWith][this.__step].AABB) == true) {
-						this.el.object3D.getWorldPosition(this.system.__testA);
-						this.system.groups[this.data.collidesWith][this.__step].el.object3D.getWorldPosition(this.system.__testB);
-						this.__distanceTest = this.system.__testA.distanceToSquared(this.system.__testB);
+				collider = collideGroup[this.__step].components.collider;
+				if (collider.data.enabled == true) {
+					if (this.AABB.intersectsBox(collider.AABB) == true) {
+						this.el.object3D.getWorldPosition(this.__testA);
+						collider.el.object3D.getWorldPosition(this.__testB);
+						this.__distanceTest = this.__testA.distanceToSquared(this.__testB);
 						if (this.__distanceTest < this.__distanceNearest) {
 							this.__distanceNearest = this.__distanceTest;
-							this.__nearestEl = this.system.groups[this.data.collidesWith][this.__step].el;
+							this.__nearestEl = collider.el;
 						}
-						this.__intersections.push(this.system.groups[this.data.collidesWith][this.__step].el);
+						this.__intersections.push(collider.el);
 					} else {
-						this.__intersectionsCleared.push(this.system.groups[this.data.collidesWith][this.__step].el);
+						this.__intersectionsCleared.push(collider.el);
 					}
 				}
 			}
+
 			this.nearestEl = this.__nearestEl;
 			this.__stepMax = this.__intersections.length;
+
 			for (this.__step = 0; this.__step < this.__stepMax; this.__step++) {
 				this.addIntersection(this.__intersections[this.__step]);
 			}
@@ -645,14 +696,15 @@ module.exports = {
 			if (this.data.static !== true) {
 				this.updateAABB();
 			}
+
 			if (this.data.autoRefresh === true) {
 				this.updateIntersections();
 			}
 		},
 		remove: function () {
-			this.system.unsubscribe(this);
+			//this.system.unsubscribe(this);
 
-			if (this.data.bounds=='auto' && this.el.object3DMap.proxy){
+			if (this.data.bounds == 'auto' && this.el.object3DMap.proxy) {
 				this.el.removeAttribute('proxy');
 			}
 
@@ -880,39 +932,40 @@ z: ${this.data.z.toFixed(2)}`
 		}
 	}),
 	'grabbable': AFRAME.registerComponent('grabbable', {
-		dependencies:['collider'],
+		dependencies: ['collider'],
 		schema: {
-			enabled: {type: 'boolean', default: true},
-
+			enabled: {
+				type: 'boolean',
+				default: true
+			},
 		},
 		init: function () {
-			this.onColliderReady = this.onColliderReady.bind(this);
+
 			this.grab = this.grab.bind(this);
 			this.release = this.release.bind(this);
 
-			this.originalColliderProperties = JSON.parse(JSON.stringify(AFRAME.utils.entity.getComponentProperty(this.el,'collider')));
-			this.originalColliderProperties.group='grabbable';
+			this.originalColliderProperties = JSON.parse(JSON.stringify(AFRAME.utils.entity.getComponentProperty(this.el, 'collider')));
 
-			if (this.originalColliderProperties.bounds){
+			if (this.originalColliderProperties.bounds) {
 				delete this.originalColliderProperties.bounds;
 			}
-			//console.log(this.originalColliderProperties);
-	
-		},
-		onColliderReady: function(){
 
 		},
-		grab: function(hand){
-			this.el.setAttribute('collider',{autoRefresh: false, static: false, interval: 20});
-			//console.log(JSON.parse(JSON.stringify(AFRAME.utils.entity.getComponentProperty(this.el,'collider'))));
+		grab: function (hand) {
+
+			this.el.setAttribute('collider', {
+				autoRefresh: false,
+				static: false,
+				interval: 20
+			});
+
 		},
-		release: function(hand){
-			this.el.setAttribute('collider',this.originalColliderProperties);
-			//console.log(JSON.parse(JSON.stringify(AFRAME.utils.entity.getComponentProperty(this.el,'collider'))));
+		release: function (hand) {
+
+			this.el.setAttribute('collider', this.originalColliderProperties);
 		},
-		update: function (oldData) {
-			this.el.setAttribute('collider','group','grabbable');
-			//console.log(JSON.parse(JSON.stringify(AFRAME.utils.entity.getComponentProperty(this.el,'collider'))));
+		update: function () {
+			this.el.setAttribute('grp__grabbable', '');
 		},
 		remove: function () {
 

@@ -15,6 +15,6 @@ require('./src/components/aframe-google-poly');
 require('./src/components/aframe-portals');
 
 require('./src/components/aframe-oculus-quest-hands');
-require('./src/components/aframe-oculus-quest-haptics');
+//require('./src/components/aframe-oculus-quest-haptics');
 //require('./src/components/hands');
 

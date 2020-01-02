@@ -15,8 +15,11 @@ module.exports = AFRAME.registerComponent('oculus-quest-haptics', {
    },
    multiple: true,
    rumble: function (e) {
-		/*
-		if (!this.gamepad){
+		var foop = navigator.vibrate(200);
+		//console.log(foop);
+		//navigator.vibrate([200,10,200]);
+		
+		/*if (!this.gamepad){
 			if (this.el.components['tracked-controls-webxr'] && this.el.components['tracked-controls-webxr'].controller) {
 				this.controller = this.el.components['tracked-controls-webxr'].controller;
 				this.gamepad = this.controller.gamepad;
@@ -34,7 +37,8 @@ module.exports = AFRAME.registerComponent('oculus-quest-haptics', {
 			this.hapticActuators[0].pulse(0.5,400);
 		} catch (erp){
 			console.log(erp);
-		}*/
+		}
+
 		var gamepads = navigator.getGamepads();
 		for (var i=0; i<gamepads.length;i++){
 			var gamepad = gamepads[i];
@@ -45,7 +49,7 @@ module.exports = AFRAME.registerComponent('oculus-quest-haptics', {
 					gamepad.hapticActuators.pulse(0.9,500);
 				}
 			}
-		}
+		}*/
 
 
 
