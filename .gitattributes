@@ -9,7 +9,6 @@
 .gitattributes text
 .gitignore text
 .jshintrc text
-.nojekyll text
 .travis.yml text
 LICENSE text
 
