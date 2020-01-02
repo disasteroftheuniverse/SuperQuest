@@ -6,15 +6,18 @@
 //  \__/\__,_| .__/ \___|_| \___,_\ \__,_|\___|___/\__|
 //           |_|                                       
 
-require('./src/components/aframe-extra-utils');
-require('./src/components/aframe-extra-collection');
-require('./src/components/aframe-shader-extras');
+require('./src/components/superquest-utils');
+require('./src/components/superquest-extras-collection');
+require('./src/components/superquest-shader-extras-collection');
 
-require('./src/components/aframe-locomote-controls');
-require('./src/components/aframe-google-poly');
-require('./src/components/aframe-portals');
+require('./src/components/superquest-teleporter-controls');
+require('./src/components/superquest-google-poly');
+require('./src/components/superquest-portals');
 
-require('./src/components/aframe-oculus-quest-hands');
+require('./src/physics/superquest-physics-lite');
+require('./src/components/superquest-hands');
+
+//not so super because I can't figure out how to access haptics anymore
 //require('./src/components/aframe-oculus-quest-haptics');
-//require('./src/components/hands');
+
 

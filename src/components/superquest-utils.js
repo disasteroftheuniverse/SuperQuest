@@ -1,12 +1,5 @@
 /*jshint esversion:6*/
-/**
- *  Callback on 3d model loaded
- *
- * @param {HTMLElement} modelEl element of model
- * @param {function} callback callback when loaded
- * @param {object} context what 'this' is in this context
- * 
- */
+
 AFRAME.utils.entity.onModel = function (modelEl, callback, context) {
 	if (context) {
 		callback = callback.bind(context);
@@ -25,16 +18,6 @@ AFRAME.utils.entity.onModel = function (modelEl, callback, context) {
 		modelEl.addEventListener('object3dset', waitForModel);
 	}
 };
-
-/**
- *  Callback on element loaded
- *
- * @param {HTMLElement} modelEl element of model
- * @param {function} callback callback when loaded
- * @param {object} context what 'this' is
- * 
- */
-
 AFRAME.utils.entity.onObject3DAdded = function (el, name, callback, context, args) {
 	if (context) {
 		callback = callback.bind(context);
@@ -62,16 +45,6 @@ AFRAME.utils.entity.onObject3DAdded = function (el, name, callback, context, arg
 		el.addEventListener('object3dset', waitForCallback);
 	}
 };
-
-/**
- *  Callback on element loaded
- *
- * @param {HTMLElement} modelEl element of model
- * @param {function} callback callback when loaded
- * @param {object} context what 'this' is
- * 
- */
-
 AFRAME.utils.entity.onLoad = function (modelEl, callback, context) {
 	if (context) {
 		callback = callback.bind(context);
@@ -143,13 +116,6 @@ AFRAME.utils.randomColor = function () {
 	}
 	return color;
 };
-/**
- *  Generate a random ID
- *
- * @param {number} length number of characters
- * @returns {String} random string of 'length' length
- * 
- */
 AFRAME.utils.makeId = function (length) {
 	var result = '';
 	var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -159,7 +125,6 @@ AFRAME.utils.makeId = function (length) {
 	}
 	return result;
 };
-
 AFRAME.utils.__helper__pool = {
 	__setDirection: {
 		__axis: new THREE.Vector3(),
@@ -202,7 +167,6 @@ AFRAME.utils.math = {
 		return v;
 	}
 };
-
 AFRAME.utils.getWhiteEnvironment = function () {
 	if (!AFRAME.utils.whiteEnvironment) {
 		var uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAMAAABFaP0WAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRF/v7+////G/xoHAAAABBJREFUeNpiYGRkYGQECDAAABIABaUzXMUAAAAASUVORK5CYII=';
@@ -299,3 +263,11 @@ AFRAME.utils.getGradientShader = function (name, colorA, colorB) {
 	}
 	return AFRAME.utils.shaders[name];
 };
+AFRAME.registerComponent('log-object3d', {
+	init: function () {
+		AFRAME.utils.entity.onModel(this.el, this.log, this);
+	},
+	log: function () {
+		console.log(this.el.object3D);
+	}
+});

@@ -67,7 +67,7 @@ module.exports = {
 		}
 	}),
 	teleporter_controls: AFRAME.registerComponent('teleporter-controls', {
-		dependencies: ['position', 'rotation', 'scale', 'virtual-hand'],
+		dependencies: ['position', 'rotation', 'scale'],
 		schema: {
 			objects: {
 				type: 'string',
@@ -138,9 +138,11 @@ module.exports = {
 			this.__angleSolve.bind(this);
 			this.offsetScalar = this.__angleSolve(this.rayAim.z, this.rayAim.y, this.data.length);
 			this.seekTeleportDestination = this.seekTeleportDestination.bind(this);
+
 			this.el.addEventListener(this.data.startOn, this.__startHandler);
 			this.el.addEventListener(this.data.cancelOn, this.__cancelHandler);
 			this.el.addEventListener(this.data.moveOn, this.__moveHandler);
+
 			this.system.subscribe(this);
 		},
 		_create: function () {
@@ -148,7 +150,7 @@ module.exports = {
 			var data = this.data;
 			var locomote = this;
 			locomote.rayOrigin = new THREE.Vector3(0, 0, 0);
-			locomote.rayAim = new THREE.Vector3(0, -1, -0.5).normalize();
+			locomote.rayAim = new THREE.Vector3(0, -0.125, -0.5).normalize();
 			this.beamEl = document.createElement('a-entity');
 			this.el.appendChild(this.beamEl);
 			this.beamEl.setAttribute('raycaster', {
@@ -213,6 +215,7 @@ module.exports = {
 			}
 			el.setObject3D('curve', locomote.curveObject);
 			el.object3DMap.curve.updateMatrixWorld(true);
+
 			AFRAME.utils.getGradientShader('teleportDestination').setValues({
 				depthTest: false,
 				depthWrite: false,
@@ -221,6 +224,7 @@ module.exports = {
 				side: THREE.DoubleSide,
 				blending: THREE.AdditiveBlending
 			});
+
 			locomote.destObject.visible = false;
 			locomote.curveObject.visible = false;
 			//el.sceneEl.object3D.add(locomote.destObject);
@@ -230,7 +234,7 @@ module.exports = {
 			locomote.destinationPoint = new THREE.Vector3();
 			locomote.midpoint = new THREE.Vector3();
 			locomote.startPoint = new THREE.Vector3();
-			locomote.humpOffset = new THREE.Vector3(0, 0.3, 0);
+			locomote.humpOffset = new THREE.Vector3(0, 0.01, 0);
 		},
 		__startHandler: function () {
 			this.system.toggleOtherHand(this);
@@ -255,13 +259,17 @@ module.exports = {
 			this.curveObject.visible = true;
 		},
 		_hideTeleportUI: function (cancel) {
+
 			if (cancel && cancel == true) {
 				this.hasDestination = null;
 			}
+
 			this.isTesting = null;
+
 			this.beamEl.setAttribute('raycaster', {
 				enabled: false
 			});
+
 			if (this.data.signal == true) {
 				//var l = this.collisionObjects.length;
 				for (var i = 0; i < this.numObjects; i++) {
@@ -270,19 +278,28 @@ module.exports = {
 					}, true);
 				}
 			}
+
 			this.curveObject.visible = false;
 			this.destObject.visible = false;
 		},
 		__cancelHandler: function () {
-			this._hideTeleportUI(true);
+
+			
+
+			this._hideTeleportUI((this.data.moveOn === this.data.cancelOn) ? false : true);
+
 		},
 		__moveHandler: function () {
 			if (this.hasDestination) {
 				this.playerTeleportOffset.copy(this.data.camera.object3D.position);
+
 				this.playerTeleportDestination.sub(this.playerTeleportOffset);
+
 				this.playerTeleportDestination.setY(this.playerTeleportDestination.y + this.system.data.playerHeightOffset);
+
 				this.data.player.object3D.parent.worldToLocal(this.playerTeleportDestination);
 				this.data.player.object3D.position.copy(this.playerTeleportDestination);
+
 				this.raycaster.refreshObjects();
 				this.seekTeleportDestination();
 				if (this.data.signal == true) {

@@ -123,20 +123,11 @@ module.exports = {
 			var dumpIntoConsole = function () {
 				el.addState('regulated');
 			};
-			AFRAME.utils.entity.onModel(el, dumpIntoConsole, comp);
 		},
 		tick: function () {
 			if (this.el.is('regulated')) {
 				this.el.object3D.position.clamp(this.data.min, this.data.max);
 			}
-		}
-	}),
-	log_object3D: AFRAME.registerComponent('log-object3d', {
-		init: function () {
-			AFRAME.utils.entity.onModel(this.el, this.log, this);
-		},
-		log: function () {
-			console.log(this.el.object3D);
 		}
 	}),
 	billboard: AFRAME.registerComponent('billboard', {
@@ -150,7 +141,6 @@ module.exports = {
 		init: function () {
 			this.tick = AFRAME.utils.throttleTick(this.tick, 20, this);
 			this.lookAtTarget = new THREE.Vector3();
-			//AFRAME.utils.entity.onModel(el, dumpIntoConsole, comp);
 		},
 		tick: function () {
 			if (this.el.object3DMap) {
