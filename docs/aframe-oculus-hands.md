@@ -135,7 +135,11 @@ Attaches one entity to another using `THREE.Object3D.attach()`. Removing this at
 
 <hr>
 
-A utility for grouping and selecting entities which does not use DOM query methods. Used by collider, grabbable, draggable, droppable and pokeable components to select and filter other collidable objects. A group is defined by `grp__<NAME_OF_GROUP>`. Use `var id = 'foo'; <a-entity>.setAttribute('grp__${id})` to add an entity to a group, and use `<a-entity grp__foo>.removeAttribute('grp__${id})` to remove an entity from a group. 
+A utility for grouping and selecting entities which does not use DOM query methods. Used by collider, grabbable, draggable, droppable and pokeable components to select and filter other collidable objects. A group is defined by `grp__<NAME_OF_GROUP>`.
+
+Use `<a-entity />.setAttribute('grp__foo')` to add an entity to a group.
+
+Use `<a-entity grp__foo />.removeAttribute('grp__foo')` to remove an entity from a group. 
 
 **Example**
 
