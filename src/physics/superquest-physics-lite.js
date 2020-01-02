@@ -2,7 +2,7 @@
 
 //const ComponentEmitter = require('component-emitter');
 //const StateMachine = require('javascript-state-machine');
-const PhysicsWorker = require('./aframe-physics-lite.worker');
+const PhysicsWorker = require('./superquest-physics-lite.worker');
 
 module.exports = {
 	system: AFRAME.registerSystem('physics', {

@@ -10,9 +10,10 @@ const TerserPlugin = require('terser-webpack-plugin');
 module.exports = {
    mode: 'production',
    entry: {
+		//'SuperQuest.full': path.join(__dirname, 'index'),
+		'physics-lite': path.join(__dirname, 'slim'),
+		'SuperQuest.slim': path.join(__dirname, 'slim'),
 		'SuperQuest.full': path.join(__dirname, 'index'),
-		'SuperQuest.slim': path.join(__dirname, 'index'),
-		'SuperQuest.standalone': path.join(__dirname, 'index'),
    },
    output: {
       path: __dirname + '/dist',
@@ -46,7 +47,7 @@ module.exports = {
 				options: {
 					inline: true,
 					fallback: true,
-					name: '[name].[hash].js'
+					name: '[name].min.js'
 				}
 			},
 		},
@@ -62,15 +63,13 @@ module.exports = {
       minimizer: [
          new TerserPlugin({
             extractComments: 'all',
-            //exclude: /[\\/]angular[\\/]/, adb pull This PC\Quest\Internal shared storage\Oculus\VideoShots\com.oculus.vrshell-20190920-054804.mp4 C:\Users\ppinh\Desktop
-            // parallel: true,
             terserOptions: {
                drop_console: false,
                ecma: undefined,
                warnings: false,
                parse: {},
                compress: {},
-               mangle: true, // Note `mangle.properties` is `false` by default.
+               mangle: true, 
                module: true,
                output: null,
                toplevel: false,

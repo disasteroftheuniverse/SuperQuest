@@ -7,19 +7,21 @@
 \ \| | | | '_ \ / _ | '__//  / | | | |/ _ / __| __|
 _\ | |_| | |_) |  __| | / \_/ /| |_| |  __\__ | |_
 \__/\__,_| .__/ \___|_| \___,_\ \__,_|\___|___/\__|
-         |_|
-|
+|        |_|
 ├── <b>assets</b>/
 │   ├── hands.ma
 │   └── hands.fbx
 ├── <b>components</b>/
-│   ├── aframe-extra-collection.js
-│   ├── aframe-google-poly.js
-│   ├── aframe-oculus-quest-hands.js
-│   └── aframe-locomote-controls.js
+│   ├── superquest-extras-collection.js
+│   ├── superquest-google-poly.js
+│   ├── superquest-hands.js
+│   ├── superquest-portals.js
+│   ├── superquest-shader-extras.js
+│   ├── superquest-utils.js
+│   └── superquest-teleporter-controls.js
 └── <b>physics</b>/
-    ├── physics-lite.js
-    └── physics-lite.worker.js
+    ├── superquest-physics-lite.js
+    └── superquest-physics-lite.worker.js
 </pre>
 
 ## Installation
