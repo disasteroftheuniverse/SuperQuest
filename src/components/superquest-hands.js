@@ -320,7 +320,7 @@ module.exports = {
 				if (index === -1) {
 					group.push(member.el);
 				}
-				console.log(groups);
+				//console.log(groups);
 
 			};
 			this.subscribe = this.subscribe.bind(this);
@@ -343,7 +343,7 @@ module.exports = {
 					return;
 				}
 				group.splice(index, 1);
-				console.log(groups);
+				//console.log(groups);
 			};
 			this.unsubscribe = this.unsubscribe.bind(this);
 
@@ -428,6 +428,12 @@ module.exports = {
 			this.__testB = new THREE.Vector3();
 
 			this.AABB = new THREE.Box3();
+
+			if (this.system.debug===true){
+				var helper = new THREE.Box3Helper(this.AABB);
+				this.el.sceneEl.object3D.add(helper);
+			}
+
 			this.createAABBFromAuto = this.createAABBFromAuto.bind(this);
 			this.createAABBFromMesh = this.createAABBFromMesh.bind(this);
 			this.createAABBFromProxy = this.createAABBFromProxy.bind(this);
@@ -504,8 +510,7 @@ module.exports = {
 			});
 
 			this.AABB.setFromObject(this.el.object3DMap.proxy);
-			var helper = new THREE.Box3Helper(this.AABB);
-			this.el.sceneEl.object3D.add(helper);
+
 			this.updateAABB = function () {
 				this.AABB.setFromObject(this.el.object3DMap.proxy);
 			};
@@ -516,8 +521,6 @@ module.exports = {
 			var positionWorld = new THREE.Vector3();
 			this.el.object3D.getWorldPosition(positionWorld);
 			this.AABB.setFromCenterAndSize(positionWorld, this.data.size);
-			var helper = new THREE.Box3Helper(this.AABB);
-			this.el.sceneEl.object3D.add(helper);
 
 			this.updateAABB = function () {
 				this.el.object3D.getWorldPosition(positionWorld);
@@ -530,11 +533,6 @@ module.exports = {
 		createAABBFromProxy: function () {
 
 			this.AABB.setFromObject(this.el.object3DMap.proxy);
-			//console.log(this.el.object3DMap);
-			//console.log(this.el.object3DMap.proxy);
-
-			var helper = new THREE.Box3Helper(this.AABB);
-			this.el.sceneEl.object3D.add(helper);
 
 			this.updateAABB = function () {
 				this.AABB.setFromObject(this.el.object3DMap.proxy);
@@ -557,8 +555,7 @@ module.exports = {
 			center.sub(positionWorld);
 			size.divide(this.el.object3D.scale);
 
-			var helper = new THREE.Box3Helper(this.AABB);
-			this.el.sceneEl.object3D.add(helper);
+
 
 			this.updateAABB = function () {
 				this.AABB.setFromObject(this.el.object3DMap.mesh);
@@ -938,11 +935,16 @@ z: ${this.data.z.toFixed(2)}`
 				type: 'boolean',
 				default: true
 			},
+			align: {
+				type: 'boolean',
+				default: true
+			},
 		},
 		init: function () {
 
 			this.grab = this.grab.bind(this);
 			this.release = this.release.bind(this);
+			this.align = this.align.bind(this);
 
 			this.originalColliderProperties = JSON.parse(JSON.stringify(AFRAME.utils.entity.getComponentProperty(this.el, 'collider')));
 
@@ -950,7 +952,14 @@ z: ${this.data.z.toFixed(2)}`
 				delete this.originalColliderProperties.bounds;
 			}
 
+			this.targetPosition = new THREE.Vector3();
+			this.targetQuaternion = new THREE.Quaternion();
+
+			this.intermediatePos = new THREE.Vector3();
+			this.intermediateQuat = new THREE.Quaternion();
+
 		},
+		align: function(){},
 		grab: function (hand) {
 
 			this.el.setAttribute('collider', {
@@ -958,6 +967,12 @@ z: ${this.data.z.toFixed(2)}`
 				static: false,
 				interval: 20
 			});
+
+			if (this.data.align==true){
+
+
+
+			}
 
 		},
 		release: function (hand) {
