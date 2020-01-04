@@ -108,19 +108,16 @@ module.exports = {
 							orient: rot
 						});
 						//var labelPos = AFRAME.utils.styleParser.parse({x: node.position.x,y: node.position.y, z: node.position.z});
-
 						if (debug === true) {
 							var label = `<a-text position="${node.position.x} ${node.position.y} ${node.position.z}"  
 						scale="0.1 0.1 0.1" look-at="#vr-camera" value="${node.name}" text="align: center; width: 1;"></a-text>`;
 							el.insertAdjacentHTML('afterbegin', label);
 						}
-
 					});
 				}
 			);
 		},
 		remove: function () {
-
 		}
 	}),
 	'hand': AFRAME.registerComponent('oculus-quest-hands', {
@@ -257,20 +254,16 @@ module.exports = {
 		registerEventListeners: function () {
 			var intersections = null;
 			var self = this;
-
 			self.onTriggerTouchStart = function () {
-
 				self.el.removeState('pointing');
 				self.setDirty();
 			};
-
 			self.onTriggerTouchEnd = function () {
 				if (!self.el.is('holding-something')) {
 					self.el.addState('pointing');
 				}
 				self.setDirty();
 			};
-
 			self.onGripDown = function () {
 				intersections = self.collider.getIntersections('grabbable', true);
 				if (intersections) {
@@ -291,8 +284,6 @@ module.exports = {
 					if (self.holdingEl.components.grabbable) {
 						self.holdingEl.components.grabbable.grab(self);
 						self.holdPose = self.holdingEl.components.grabbable.data.pose;
-
-
 					}
 					self.el.addState('pose');
 				} else {
@@ -300,28 +291,21 @@ module.exports = {
 				}
 				self.setDirty();
 			};
-
 			self.onGripUp = function () {
 				if (self.el.is('holding-something')) {
-
 					if (self.holdingEl.components.grabbable) {
 						self.holdingEl.components.grabbable.release(self);
 					}
-
 					self.holdingEl.removeAttribute('constraint');
 					self.el.removeState('holding-something');
-
 					self.holdPose = null;
-
 					self.holdingEl.emit('released', {
 						handEl: self.el,
 						hand: self.data.hand
 					});
-
 					self.el.emit('release', {
 						holdingEl: self.holdingEl
 					});
-
 					self.holdingEl = null;
 				}
 				if (self.el.is('gripping')) {
@@ -329,7 +313,6 @@ module.exports = {
 				}
 				self.setDirty();
 			};
-
 			self.onConstraintChanged = function () {
 				if (self.el.is('holding-something')) {
 					//console.log(`${self.data.hand} released grip`);
@@ -342,27 +325,21 @@ module.exports = {
 				}
 				self.setDirty();
 			};
-
 			self.onThumbTouchStart = function () {
 				self.el.removeState('thumbsup');
 				self.setDirty();
 			};
-
 			self.onThumbTouchEnd = function () {
 				if (!self.el.is('holding-something')) {
 					self.el.addState('thumbsup');
 				}
 				self.setDirty();
 			};
-
 			self.el.addEventListener('gripdown', self.onGripDown);
 			self.el.addEventListener('gripup', self.onGripUp);
-
 			self.el.addEventListener('constraintchanged', self.onConstraintChanged);
-
 			self.el.addEventListener('triggertouchend', self.onTriggerTouchEnd);
 			self.el.addEventListener('triggertouchstart', self.onTriggerTouchStart);
-
 			self.el.addEventListener('thumbsticktouchstart', self.onThumbTouchStart);
 			self.el.addEventListener('xbuttontouchstart', self.onThumbTouchStart);
 			self.el.addEventListener('ybuttontouchstart', self.onThumbTouchStart);
@@ -453,29 +430,21 @@ module.exports = {
 			this.grab = this.grab.bind(this);
 			this.release = this.release.bind(this);
 			this.align = this.align.bind(this);
-
 			this.registerEventListeners = this.registerEventListeners.bind(this);
 			this.el.setAttribute('grp__grabbable', '');
-
-
 			this.originalColliderProperties = JSON.parse(JSON.stringify(AFRAME.utils.entity.getComponentProperty(this.el, 'collider')));
-
 			if (this.originalColliderProperties.bounds) {
 				delete this.originalColliderProperties.bounds;
 			}
-
 			this.targetPosition = new THREE.Vector3();
 			this.targetQuaternion = new THREE.Quaternion();
 			this.intermediatePos = new THREE.Vector3();
 			this.intermediateQuat = new THREE.Quaternion();
 			this.startPos = new THREE.Vector3();
 			this.startQuat = new THREE.Quaternion();
-
 			this.weight = {
 				value: 0
 			};
-
-
 			this.registerEventListeners();
 		},
 		registerEventListeners: function () {
@@ -483,29 +452,22 @@ module.exports = {
 			//this.el.addEventListener('released', this.onReleased);
 		},
 		grab: function (hand) {
-
 			this.el.setAttribute('collider', {
 				autoRefresh: false,
 				static: false,
 				interval: 20
 			});
-
 			if (this.handAlign !== 'none' && hand.el.components[`align__${this.data.handAlign}`]) {
 				console.log(this);
 				this.align(hand.el.object3DMap[`align__${this.data.handAlign}`]);
 			}
-
-
 		},
 		align: function (alignTo) {
 			this.targetPosition.copy(alignTo.position);
 			this.targetQuaternion.copy(alignTo.quaternion);
-
 			this.startPos.copy(this.el.object3D.position);
 			this.startQuat.copy(this.el.object3D.quaternion);
-
 			var component = this;
-
 			AFRAME.ANIME.remove(component.weight);
 			AFRAME.ANIME({
 				targets: component.weight,
@@ -518,20 +480,16 @@ module.exports = {
 				update: function () {
 					component.intermediatePos.lerpVectors(component.startPos, component.targetPosition, component.weight.value);
 					THREE.Quaternion.slerp(component.startQuat, component.targetQuaternion, component.intermediateQuat, component.weight.value);
-
 					if (component.el.is('constrained')) {
 						component.el.object3D.position.copy(component.intermediatePos);
 						component.el.object3D.quaternion.copy(component.intermediateQuat);
 					}
 				}
 			});
-
 			//this.align.weight
-
-
 		},
 		release: function (hand) {
-			console.log(hand);
+			//console.log(hand);
 			this.el.setAttribute('collider', this.originalColliderProperties);
 		}
 	}),
@@ -581,7 +539,6 @@ module.exports = {
 			this.__testA = new THREE.Vector3();
 			this.__testB = new THREE.Vector3();
 			this.AABB = new THREE.Box3();
-
 			if (this.data.debug === true) {
 				var helper = new THREE.Box3Helper(this.AABB);
 				this.el.sceneEl.object3D.add(helper);
@@ -917,7 +874,6 @@ module.exports = {
 		},
 		init: function () {
 			this.originalParent = this.el.object3D.parent;
-
 		},
 		update: function (oldData) {
 			if (!this.data.parent.object3DMap.constraint) {
@@ -988,22 +944,15 @@ module.exports = {
 		multiple: true,
 		init: function () {
 			if (!this.id) return;
-
 			this.origin = new THREE.Group();
-
 			if (this.data.debug == true) {
 				this.helper = AFRAME.utils.axishelper();
 				this.origin.add(this.helper);
 				this.helper.scale.multiplyScalar(0.01);
 			}
-
-
 			this.setRotation = this.setRotation.bind(this);
 			this.setPosition = this.setPosition.bind(this);
-
 			this.origin.name = this.id;
-
-			
 			this.el.setObject3D(`align__${this.id}`, this.origin);
 		},
 		setPosition: function (vec3) {
