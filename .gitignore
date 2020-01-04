@@ -16,3 +16,5 @@ ignore
 *.LICENSE*
 
 *hands.0*.m*
+
+src/assets/*.js*

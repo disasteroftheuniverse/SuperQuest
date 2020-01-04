@@ -1,7 +1,7 @@
 /*jshint esversion: 8*/
 
 //const ComponentEmitter = require('component-emitter');
-const StateMachine = require('javascript-state-machine');
+//const StateMachine = require('javascript-state-machine');
 const PhysicsWorker = require('./superquest-physics-lite.worker');
 
 var pageBody = function () {

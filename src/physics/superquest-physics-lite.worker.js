@@ -1,6 +1,6 @@
 /*jshint esversion: 8*/
 //const ComponentEmitter = require('component-emitter');
-const StateMachine = require('javascript-state-machine');
+//const StateMachine = require('javascript-state-machine');
 const OIMO = require('oimo');
 var World = null;
 var Bodies = new Map();
