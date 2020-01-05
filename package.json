@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-	 "push": "push.sh",
-	 "bundle": "bundle.sh"
+    "push": "push.sh",
+    "bundle": "bundle.sh"
   },
   "keywords": [
     "aframe",
@@ -28,6 +28,7 @@
   "author": "patrick pineda",
   "license": "MIT",
   "dependencies": {
+    "@tweenjs/tween.js": "^18.5.0",
     "aframe": "^1.0.3",
     "es6-template-strings": "^2.0.1",
     "javascript-state-machine": "^3.1.0",

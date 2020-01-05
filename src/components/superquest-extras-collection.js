@@ -325,7 +325,9 @@ module.exports = {
 		}
 	}),
 	attr_set: AFRAME.registerComponent('set', {
-
+		schema:{
+			type: 'string'
+		},
 		multiple: true,
 
 		init: function () {

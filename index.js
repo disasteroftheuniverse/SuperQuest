@@ -10,9 +10,9 @@ require('./src/components/superquest-utils');
 require('./src/components/superquest-extras-collection');
 require('./src/components/superquest-shader-extras-collection');
 
-//require('./src/components/superquest-teleporter-controls');
+require('./src/components/superquest-teleporter-controls');
 require('./src/components/superquest-google-poly');
-//require('./src/components/superquest-portals');
+require('./src/components/superquest-portals');
 
 require('./src/physics/superquest-physics-lite');
 require('./src/components/superquest-hands');

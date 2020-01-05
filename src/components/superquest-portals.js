@@ -134,5 +134,14 @@ module.exports = {
 		update: function () {
 			this.addToLayer();
 		}
+	}),
+	foo: AFRAME.registerShader('superfoo',{
+		schema: {
+			image: {type:'map',is: 'uniform'},
+			size: {type:'number',is: 'uniform', default: 0.001},
+		},
+		raw:true,
+		vertexShader: "precision highp float;\nprecision highp int;\n\nuniform mat4 modelMatrix;\nuniform mat4 modelViewMatrix;\nuniform mat4 projectionMatrix;\nuniform mat4 viewMatrix;\nuniform mat3 normalMatrix;\n\nattribute vec3 position;\n\nvoid main() {\n\n    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n\n}",
+		fragmentShader: "precision highp float;\nprecision highp int;\n\nuniform sampler2D image;\nuniform float size;\n\nvoid main() {\n    \n    gl_FragColor =  texture2D( image, vec2(gl_FragCoord.x* size, gl_FragCoord.y* size) );\n\n}",
 	})
 };

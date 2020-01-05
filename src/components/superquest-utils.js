@@ -68,14 +68,25 @@ AFRAME.utils.entity.onSceneLoaded = function (el, callback, context) {
 	//var hasMesh = modelEl.getObject3D('mesh');
 	var waitForCallback = function () {
 		callback();
-		el.sceneEl.removeEventListener('loaded', waitForCallback);
+		//el.sceneEl.removeEventListener('loaded', waitForCallback);
 	};
+	//var poller;
+	var pollScene = function(){
+		if (el.sceneEl.hasLoaded) {
+			callback();
+		} else {
+			setTimeout(pollScene,100);
+		}
+	};
+
 	if (el.sceneEl.hasLoaded) {
 		callback();
 	} else {
+		pollScene();
+		/*
 		el.sceneEl.addEventListener('loaded', waitForCallback, {
 			once: true
-		});
+		});*/
 	}
 };
 AFRAME.utils.device.hasControllers = function () {
