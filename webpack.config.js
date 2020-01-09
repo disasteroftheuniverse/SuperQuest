@@ -11,9 +11,9 @@ module.exports = {
    mode: 'production',
    entry: {
 		//'SuperQuest.full': path.join(__dirname, 'index'),
-		'physics-lite': path.join(__dirname, 'src/physics-lite/index'),
-		'SuperQuest.slim': path.join(__dirname, 'slim'),
-		'SuperQuest.full': path.join(__dirname, 'index'),
+		'Physics-Lite': path.join(__dirname, 'src/physics-lite/index'),
+		//'SuperQuest.slim': path.join(__dirname, 'slim'),
+		'SuperQuest': path.join(__dirname, 'index'),
    },
    output: {
       path: __dirname + '/dist',
