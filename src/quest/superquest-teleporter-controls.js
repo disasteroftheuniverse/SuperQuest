@@ -356,7 +356,32 @@ module.exports = {
 			if (!this.isTesting) return;
 			this.seekTeleportDestination();
 		}
-	})
+	}),
+	locomote: AFRAME.registerComponent('locomote', {
+		schema: {
+			camera: {
+				type: 'string' ,
+				default:'#vr-camera'
+			},
+			player: {
+				type: 'selector' ,
+				default:'#vr-player'
+			},
+		},
+		init: function () {
+			var data = this.data;
+			//this.el.setAttribute('gamepad-controls',{debug: true, enabled: true, camera: data.camera});
+			this.el.addEventListener('axismove',
+			(e)=>{
+				//e.detail.axis;
+				//console.log(e.detail.axis);
+				//data.camera
+
+			});
+		},
+
+	}),
+	
 };
 
 

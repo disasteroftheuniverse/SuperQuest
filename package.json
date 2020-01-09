@@ -31,6 +31,7 @@
     "@tweenjs/tween.js": "^18.5.0",
     "aframe": "^1.0.3",
     "es6-template-strings": "^2.0.1",
+    "es6-tween": "^5.5.10",
     "javascript-state-machine": "^3.1.0",
     "oimo": "^1.0.9"
   },

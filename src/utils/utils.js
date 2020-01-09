@@ -71,11 +71,11 @@ AFRAME.utils.entity.onSceneLoaded = function (el, callback, context) {
 		//el.sceneEl.removeEventListener('loaded', waitForCallback);
 	};
 	//var poller;
-	var pollScene = function(){
+	var pollScene = function () {
 		if (el.sceneEl.hasLoaded) {
 			callback();
 		} else {
-			setTimeout(pollScene,100);
+			setTimeout(pollScene, 100);
 		}
 	};
 
@@ -189,38 +189,7 @@ AFRAME.utils.getWhiteEnvironment = function () {
 	}
 	return AFRAME.utils.whiteEnvironment;
 };
-AFRAME.utils.axishelper = function () {
-	var originVert = new THREE.Vector3(0, 0, 0);
-	var group = new THREE.Group();
-	var yGeo = new THREE.Geometry();
-	var xGeo = new THREE.Geometry();
-	var zGeo = new THREE.Geometry();
-	yGeo.vertices.push(originVert, new THREE.Vector3(0, 1, 0));
-	xGeo.vertices.push(originVert, new THREE.Vector3(1, 0, 0));
-	zGeo.vertices.push(originVert, new THREE.Vector3(0, 0, 1));
-	var yLine = new THREE.Line(
-		yGeo,
-		new THREE.LineBasicMaterial({
-			color: 'green'
-		})
-	);
-	var xLine = new THREE.Line(
-		xGeo,
-		new THREE.LineBasicMaterial({
-			color: 'red'
-		})
-	);
-	var zLine = new THREE.Line(
-		zGeo,
-		new THREE.LineBasicMaterial({
-			color: 'blue'
-		})
-	);
-	group.add(yLine);
-	group.add(xLine);
-	group.add(zLine);
-	return group;
-};
+
 AFRAME.utils.shaders = {};
 AFRAME.utils.getGradientShader = function (name, colorA, colorB) {
 	if (!AFRAME.utils.shaders[name]) {
@@ -282,3 +251,36 @@ AFRAME.registerComponent('log-object3d', {
 		console.log(this.el.object3D);
 	}
 });
+
+AFRAME.utils.axishelper = function () {
+	var originVert = new THREE.Vector3(0, 0, 0);
+	var group = new THREE.Group();
+	var yGeo = new THREE.Geometry();
+	var xGeo = new THREE.Geometry();
+	var zGeo = new THREE.Geometry();
+	yGeo.vertices.push(originVert, new THREE.Vector3(0, 1, 0));
+	xGeo.vertices.push(originVert, new THREE.Vector3(1, 0, 0));
+	zGeo.vertices.push(originVert, new THREE.Vector3(0, 0, 1));
+	var yLine = new THREE.Line(
+		yGeo,
+		new THREE.LineBasicMaterial({
+			color: 'green'
+		})
+	);
+	var xLine = new THREE.Line(
+		xGeo,
+		new THREE.LineBasicMaterial({
+			color: 'red'
+		})
+	);
+	var zLine = new THREE.Line(
+		zGeo,
+		new THREE.LineBasicMaterial({
+			color: 'blue'
+		})
+	);
+	group.add(yLine);
+	group.add(xLine);
+	group.add(zLine);
+	return group;
+};

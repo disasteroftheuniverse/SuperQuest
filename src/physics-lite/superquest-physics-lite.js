@@ -26,7 +26,7 @@ module.exports = {
 				type: 'vec3',
 				default: {
 					x: 0,
-					y: -9,
+					y: -9.8,
 					z: 0
 				}
 			},
@@ -133,7 +133,7 @@ module.exports = {
 					PAGE_BODY: body.pageBody
 				});
 
-				console.dir(body.BODY_CONFIG);
+				//console.dir(body.BODY_CONFIG);
 
 			};
 			this.subscribe=this.subscribe.bind(this);
@@ -490,12 +490,6 @@ module.exports = {
             var geometry;
             var edges;
             var line;
-            //var pos = new THREE.Vector3();
-            //var quat = new THREE.Quaternion();
-            // var eul = new THREE.Vector3();
-            //var rot = new THREE.Vector3();
-            //var q = new OIMO;
-            //q.world
             switch (data.type) {
                case 'cylinder':
                   geometry = new THREE.CylinderBufferGeometry(data.size.x, data.size.x, data.size.y, 16, 1);

@@ -8,14 +8,9 @@ _These components should **not** be used in conjunction with other hand-control 
 
 The design file for the hand model can be found in [`./src/assets`](./src/assets). The model may be edited in [Autodesk Maya](https;//autodesk.com/maya) to add additional [gestures](#Gestures) or customize [alignment targets](#Alignments). Additional 3D editors such as Blender may be supported in the future. Please refrain from adding crude or insulting gestures to the model.
 
-
 Support may eventually be added for [Oculus Hand Tracking](https://www.oculus.com/blog/introducing-hand-tracking-on-oculus-quest-bringing-your-real-hands-into-vr/?locale=en_US).
 
-<hr>
-
 ## **oculus-quest-hands**
-
-<hr>
 
 A wrapper for [oculus-touch-controls](https://aframe.io/docs/master/components/oculus-touch-controls.html) that adds additional events, methods and a [prescribed hand model](./assets.md). This model supports a range of pre-animated poses and gestures to accommodate common gestures a user might make in VR.
 
@@ -59,11 +54,7 @@ Gestures are stored as animation targets in the [prescribed hand model](./assets
 
 The presribed hand model includes a number of transforms which assist in aligning objects to different hand gestures when they are picked up. Which alignment a grabbed item aligns to may be configured with the ['grabbable' component](##grabbable).
 
-<hr>
-
 ## **collider**
-
-<hr>
 
 A simple AABB collision detection system.
 
@@ -108,11 +99,9 @@ A simple AABB collision detection system.
 |  _hitstart_ | Emitted from both intersecting entities when their AABBs overlap. |
 |  _hitend_ | Emitted from both intersecting entities when their AABBs no longer overlap. |
 
-<hr>
+
 
 ## **constraint**
-
-<hr>
 
 Attaches one entity to another using `THREE.Object3D.attach()`. Removing this attribute restores the entity to its original parent. Used by [oculus-quest-hands](##oculus-quest-hands) to pick up and hold objects. This component is _not_ a dynamic constraint. 
 
@@ -129,11 +118,9 @@ Attaches one entity to another using `THREE.Object3D.attach()`. Removing this at
 |---|---|---|---|
 |  parent | _selector_ |  `null` | Another entity to attach this one to. May not be the same entity.  |
 
-<hr>
+
 
 ## **grp**
-
-<hr>
 
 A utility for grouping and selecting entities which does not use DOM query methods. Used by collider, grabbable, draggable, droppable and pokeable components to select and filter other collidable objects. A group is defined by `grp__<NAME_OF_GROUP>`.
 
