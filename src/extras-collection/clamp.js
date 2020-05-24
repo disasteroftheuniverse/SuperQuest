@@ -21,11 +21,10 @@ module.exports = AFRAME.registerComponent('clamp', {
 	},
 	init: function () {
 		this.tick = AFRAME.utils.throttleTick(this.tick, 10, this);
-		const el = this.el,
-			comp = this;
-		var dumpIntoConsole = function () {
-			el.addState('regulated');
-		};
+
+		//var dumpIntoConsole = function () {
+      this.el.addState('regulated');
+		//};
 	},
 	tick: function () {
 		if (this.el.is('regulated')) {

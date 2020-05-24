@@ -4,7 +4,6 @@
   "description": "A collection of AFRAME components tailored for use with the Oculus Quest mobile virtual reality headset.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "push": "push.sh",
     "bundle": "bundle.sh"
   },
@@ -47,6 +46,7 @@
     "hard-source-webpack-plugin": "^0.13.1",
     "image-webpack-loader": "^6.0.0",
     "jshint": "^2.11.1",
+    "nodemon": "^2.0.4",
     "prettier": "^1.19.1",
     "style-loader": "^0.23.1",
     "terser-webpack-plugin": "^2.3.6",
