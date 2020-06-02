@@ -22,9 +22,14 @@ module.exports = {
 			type: 'asset'
 		},
 		init: function () {
-			var self = this;
-			var loader = new THREE.ObjectLoader();
+         var self = this;
+
+         
+         
+         var loader = new THREE.ObjectLoader();
+         //loader.setCrossOrigin('anonymous');
 			loader.load(this.data, (obj) => {
+            console.log(obj);
 				self.el.setObject3D('mesh', obj);
 				self.el.object3DMap.mesh.updateMatrixWorld(true);
 			});

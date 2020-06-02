@@ -62,3 +62,22 @@ Aligns the Z-axis of an entity to always face towards a specified entity;
 | Property | Property Type | Default Value |  Description  |
 |---|---|---|---|
 |  src | _selector_  |  _null_  | Selector of the entity that the billboard should face towards. |
+
+
+## **Google Poly**
+
+
+
+Include a 3d Model from google poly.
+**Example**
+
+```html
+<a-entity id="bear" google-poly="56ym_pyVnel"></a-entity>
+
+```
+
+**Properties**
+
+| Property | Property Type | Default Value |  Description  |
+|---|---|---|---|
+|  google-poly | _string_  |  _null_  | The ID of the google poly model eg: https://poly.google.com/view/56ym_pyVnel  |
