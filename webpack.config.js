@@ -13,7 +13,8 @@ module.exports = {
 		//'SuperQuest.full': path.join(__dirname, 'index'),
 		'Physics-Lite': path.join(__dirname, 'src/physics-lite/index'),
 		//'SuperQuest.slim': path.join(__dirname, 'slim'),
-		'SuperQuest': path.join(__dirname, 'index'),
+      'SuperQuest': path.join(__dirname, 'index'),
+      'google-poly-component': path.resolve(__dirname, 'src','extras-collection','google-poly'),
    },
    output: {
       path: __dirname + '/dist',
