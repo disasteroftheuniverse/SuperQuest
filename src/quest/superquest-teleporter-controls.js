@@ -1,5 +1,4 @@
 /*jshint esversion: 6*/
-
 module.exports = {
 	teleporter_system: AFRAME.registerSystem('teleporter-controls', {
 		schema: {
@@ -45,12 +44,10 @@ module.exports = {
 				this.marker.setAttribute('id', 'teleport-marker-' + AFRAME.utils.makeId(5));
 				this.marker.classList.add('teleport-marker');
             this.el.appendChild(this.marker);
-            
 				var mesh = new THREE.Mesh(
 					new THREE.CylinderBufferGeometry(this.data.markerRadius, this.data.markerRadius, this.data.markerHeight, this.data.markerDivisions, 1, true),
 					AFRAME.utils.getGradientShader('teleportDestination', black, component.yesColor)
             );
-            
 				this.marker.setObject3D('mesh', mesh);
 				mesh.updateMatrixWorld(true);
 				this.marker.object3DMap.mesh.position.setY(this.data.markerHeight / 2);
@@ -59,22 +56,18 @@ module.exports = {
 			} else if (!this.marker && this.data.marker) {
 				this.marker = this.data.marker;
          }
-         
 			if (this.components.length > 1) {
 				this.hasTwoHands = true;
          }
-         
 			component.destObject = this.marker.object3D;
 			component._create();
       },
       unsubscribe: function(component){
          let index = this.components.indexOf(component);
          this.components.splice(index,1);
-
          if (this.components.length < 2) {
             this.hasTwoHands = false;
          }
-         
       },
       toggleOtherHand: function (component) {
 			if (!this.hasTwoHands) return;
@@ -146,13 +139,10 @@ module.exports = {
 			this.__startHandler = this.__startHandler.bind(this);
 			this.__moveHandler = this.__moveHandler.bind(this);
          this.__cancelHandler = this.__cancelHandler.bind(this);
-
          this.registerListeners = this.registerListeners.bind(this);
          this.deregisterListeners = this.deregisterListeners.bind(this);
          //this.__cancelHandler = this.__cancelHandler.bind(this);
-         
          this._hideTeleportUI = this._hideTeleportUI.bind(this);
-         
 			this._create = this._create.bind(this);
 			this.rayOrigin = new THREE.Vector3(0, 0, 0);
 			this.rayAim = new THREE.Vector3(0, -1, -0.5).normalize();
@@ -162,17 +152,13 @@ module.exports = {
 			this.offsetScalar = this.__angleSolve(this.rayAim.z, this.rayAim.y, this.data.length);
          this.seekTeleportDestination = this.seekTeleportDestination.bind(this);
          this.system.subscribe(this);
-         
       },
       update: function(old){
          //console.log(this)
-
-         console.log('teleport controls updated\n new:', this.data,'\nold: ');
+        //console.log('teleport controls updated\n new:', this.data,'\nold: ');
          this.deregisterListeners();
          this.registerListeners();
-
          //console.log(this);
-
       },
       registerListeners: function () {
          if (!this.registeredListeners) {
@@ -182,7 +168,6 @@ module.exports = {
                moveOn: null
             };
          }
-
          if (this.registeredListeners.startOn === null) {
             this.registeredListeners.startOn=[];
             this.data.startOn.forEach(eventName => {
@@ -190,7 +175,6 @@ module.exports = {
                this.el.addEventListener(eventName, this.__startHandler);
             }, this);
          }
-
          if (this.registeredListeners.cancelOn === null) {
             this.registeredListeners.cancelOn=[];
             this.data.cancelOn.forEach(eventName => {
@@ -198,7 +182,6 @@ module.exports = {
                this.el.addEventListener(eventName, this.__cancelHandler);
             }, this);
          }
-
          if (this.registeredListeners.moveOn === null) {
             this.registeredListeners.moveOn=[];
             this.data.moveOn.forEach(eventName => {
@@ -206,37 +189,27 @@ module.exports = {
                this.el.addEventListener(eventName, this.__moveHandler);
             }, this);
          }
-
-
-         
-
-
-
       },
       deregisterListeners: function(){
          if (!this.registeredListeners) return;
-
          if (this.registeredListeners.startOn !== null) {
             this.registeredListeners.startOn.forEach(eventName => {
                this.el.removeEventListener(eventName, this.__startHandler);
             }, this);
             this.registeredListeners.startOn = null;
          }
-
          if (this.registeredListeners.moveOn !== null) {
             this.registeredListeners.moveOn.forEach(eventName => {
                this.el.removeEventListener(eventName, this.__moveHandler);
             }, this);
             this.registeredListeners.moveOn = null;
          }
-
          if (this.registeredListeners.cancelOn !== null) {
             this.registeredListeners.cancelOn.forEach(eventName => {
                this.el.removeEventListener(eventName, this.__cancelHandler);
             }, this);
             this.registeredListeners.cancelOn = null;
          }
-
       },
 		_create: function () {
 			var el = this.el;
@@ -257,7 +230,6 @@ module.exports = {
 				autoRefresh: false,
 				//interval: 8
          });
-         
 			locomote.raycaster = this.beamEl.components.raycaster;
 			locomote.v0 = new THREE.Vector3(0, 0, 0);
 			locomote.v1 = new THREE.Vector3(0, 0, -1.0);
@@ -310,7 +282,6 @@ module.exports = {
 			}
 			el.setObject3D('curve', locomote.curveObject);
 			el.object3DMap.curve.updateMatrixWorld(true);
-
          AFRAME.utils
          .getGradientShader('teleportDestination')
          .setValues({
@@ -321,7 +292,6 @@ module.exports = {
 				side: THREE.DoubleSide,
 				blending: THREE.AdditiveBlending
 			});
-
 			locomote.destObject.visible = false;
 			locomote.curveObject.visible = false;
 			//el.sceneEl.object3D.add(locomote.destObject);
@@ -361,13 +331,10 @@ module.exports = {
 			if (cancel && cancel == true) {
 				this.hasDestination = null;
 			}
-
 			this.isTesting = null;
-
 			this.beamEl.setAttribute('raycaster', {
 				enabled: false
 			});
-
 			if (this.data.signal == true) {
 				//var l = this.collisionObjects.length;
 				for (var i = 0; i < this.numObjects; i++) {
@@ -376,7 +343,6 @@ module.exports = {
 					}, true);
 				}
 			}
-         
 			this.curveObject.visible = false;
 			this.destObject.visible = false;
 		},
@@ -384,17 +350,14 @@ module.exports = {
 			this._hideTeleportUI( (AFRAME.utils.deepEqual(this.data.moveOn, this.data.cancelOn))? false : true);
 		},
 		__moveHandler: function () {
-        console.log('MOVE ACTIVE');
+       //console.log('MOVE ACTIVE');
 			if (this.hasDestination) {
 				this.playerTeleportOffset.copy(this.data.camera.object3D.position);
            //console.log('boop')
 				this.playerTeleportDestination.sub(this.playerTeleportOffset);
-
 				this.playerTeleportDestination.setY(this.playerTeleportDestination.y + this.system.data.playerHeightOffset);
-
 				this.data.player.object3D.parent.worldToLocal(this.playerTeleportDestination);
 				this.data.player.object3D.position.copy(this.playerTeleportDestination);
-
 				this.raycaster.refreshObjects();
 				this.seekTeleportDestination();
 				if (this.data.signal == true) {
@@ -415,16 +378,12 @@ module.exports = {
 				this.testEl = this.collisionObjects[this.step];
 				this.intersection = this.raycaster.getIntersection(this.testEl);
 				if (this.intersection) {
-
 					this.playerTeleportDestination.copy(this.intersection.point);
 					this.hasDestination = true;
                this.el.object3D.getWorldPosition(this.startPoint);
-               
 					this.destObject.position.copy(this.intersection.point);
                this.orientDestNormalVec.copy(this.intersection.face.normal);
-               
                AFRAME.utils.math.setDirection(this.orientDestNormalVec, this.orientDestQuat);
-               
 					this.destObject.quaternion.copy(this.orientDestQuat);
 					this.destinationPoint.copy(this.intersection.point);
 					this.midpoint.lerpVectors(this.startPoint, this.intersection.point, 0.5);
@@ -461,15 +420,12 @@ module.exports = {
          if (this.el && this.el.object3DMap && this.el.object3DMap.curve) {
             this.el.removeObject3D('curve');
          }
-         
          if (this.beamEl){
             this.beamEl.removeAttribute('raycaster');
             this.el.removeChild(this.beamEl);
             this.beamEl.dispose();
          }
-
          this.system.unsubscribe(this);
-
       },
 	}),
 	locomote: AFRAME.registerComponent('locomote', {
@@ -491,13 +447,8 @@ module.exports = {
 				//e.detail.axis;
 				//console.log(e.detail.axis);
 				//data.camera
-
 			});
 		},
-
 	}),
-	
 };
-
-
 //SuperQuestTeleport;
