@@ -1,7 +1,12 @@
 /*jshint esversion: 6*/
+
 module.exports = {
 	teleporter_system: AFRAME.registerSystem('teleporter-controls', {
 		schema: {
+         noSwap: {
+            type: 'boolean',
+            default: false,
+         },
 			marker: {
 				type: 'selector'  
 			},
@@ -70,6 +75,7 @@ module.exports = {
          }
       },
       toggleOtherHand: function (component) {
+         if (this.data.noSwap==true) return;
 			if (!this.hasTwoHands) return;
 			this.otherHandIndex = (component.locomoteID == 1) ? 0 : 1;
 			//this.components[this.otherHandIndex].hasDestination=null;
@@ -94,6 +100,10 @@ module.exports = {
 			moveOn: {
 				type: 'array',
 				default: ['ybuttonup','bbuttonup','trackpadup']
+         },
+         toggleOn: {
+				type: 'array',
+				default: []
 			},
 			player: {
 				type: 'selector',
@@ -130,20 +140,35 @@ module.exports = {
 			}
 		},
 		init: function () {
+         //AFRAME.utils.bindAll(this);
 			this.playerTeleportDestination = new THREE.Vector3();
 			this.playerTeleportOffset = new THREE.Vector3();
 			//this.orientDestHelperVec = new THREE.Vector3();
 			this.orientDestNormalVec = new THREE.Vector3();
-			this.orientDestQuat = new THREE.Quaternion();
-			//this.noEulerHelper = new THREE.Euler(0,0,0);
+         this.orientDestQuat = new THREE.Quaternion();
+         this.tick = AFRAME.utils.throttleTick(this.tick,24,this);
+         
+			this.noEulerHelper = new THREE.Euler(0,0,0);
 			this.__startHandler = this.__startHandler.bind(this);
 			this.__moveHandler = this.__moveHandler.bind(this);
          this.__cancelHandler = this.__cancelHandler.bind(this);
+         this.__toggleHandler = this.__toggleHandler.bind(this);
+
          this.registerListeners = this.registerListeners.bind(this);
          this.deregisterListeners = this.deregisterListeners.bind(this);
-         //this.__cancelHandler = this.__cancelHandler.bind(this);
+
+         this.createTube = this.createTube.bind(this);
+         this.refreshTube =  this.refreshTube.bind(this);
+         this.createLine = this.createLine.bind(this);
+         this.refreshLine = this.refreshLine.bind(this);
+
+         this.toggled = false;
+         this.onIntersection=this.onIntersection.bind(this);
+         this.offIntersection=this.offIntersection.bind(this);
+         this.__cancelHandler = this.__cancelHandler.bind(this);
          this._hideTeleportUI = this._hideTeleportUI.bind(this);
-			this._create = this._create.bind(this);
+         this._create = this._create.bind(this);
+
 			this.rayOrigin = new THREE.Vector3(0, 0, 0);
 			this.rayAim = new THREE.Vector3(0, -1, -0.5).normalize();
 			this.yesColor = new THREE.Color(this.data.yesColor).convertSRGBToLinear();
@@ -156,8 +181,10 @@ module.exports = {
       update: function(old){
          //console.log(this)
         //console.log('teleport controls updated\n new:', this.data,'\nold: ');
-         this.deregisterListeners();
-         this.registerListeners();
+        if (!this.registeredListeners) {
+            this.deregisterListeners();
+            this.registerListeners();
+         }
          //console.log(this);
       },
       registerListeners: function () {
@@ -165,7 +192,8 @@ module.exports = {
             this.registeredListeners = {
                startOn: null,
                cancelOn: null,
-               moveOn: null
+               moveOn: null,
+               toggleOn: null
             };
          }
          if (this.registeredListeners.startOn === null) {
@@ -189,6 +217,14 @@ module.exports = {
                this.el.addEventListener(eventName, this.__moveHandler);
             }, this);
          }
+
+         if (this.registeredListeners.toggleOn === null) {
+            this.registeredListeners.toggleOn=[];
+            this.data.toggleOn.forEach(eventName => {
+               this.registeredListeners.toggleOn.push(eventName);
+               this.el.addEventListener(eventName, this.__toggleHandler);
+            }, this);
+         }
       },
       deregisterListeners: function(){
          if (!this.registeredListeners) return;
@@ -210,6 +246,12 @@ module.exports = {
             }, this);
             this.registeredListeners.cancelOn = null;
          }
+         if (this.registeredListeners.toggleOn !== null) {
+            this.registeredListeners.toggleOn.forEach(eventName => {
+               this.el.removeEventListener(eventName, this.__toggleHandler);
+            }, this);
+            this.registeredListeners.toggleOn = null;
+         }
       },
 		_create: function () {
 			var el = this.el;
@@ -219,7 +261,6 @@ module.exports = {
 			locomote.rayAim = new THREE.Vector3(0, -0.125, -0.5).normalize();
 			this.beamEl = document.createElement('a-entity');
          this.el.appendChild(this.beamEl);
-        //console.log('boop')
 			this.beamEl.setAttribute('raycaster', {
 				origin: locomote.rayOrigin,
 				direction: locomote.rayAim,
@@ -234,12 +275,14 @@ module.exports = {
 			locomote.v0 = new THREE.Vector3(0, 0, 0);
 			locomote.v1 = new THREE.Vector3(0, 0, -1.0);
 			locomote.v2 = new THREE.Vector3(0, -1, -3);
-			locomote.v3 = new THREE.Vector3(0, 0, 0);
+         locomote.v3 = new THREE.Vector3(0, 0, 0);
+         
 			var curve = new THREE.CubicBezierCurve3(
 				locomote.v0, locomote.v3,
 				locomote.v1,
 				locomote.v2
-			);
+         );
+         
 			switch (data.style) {
 			case 'tube':
 				locomote.curveGeometry = new THREE.TubeBufferGeometry(curve, 24, 0.0075, 2, false);
@@ -302,8 +345,21 @@ module.exports = {
 			locomote.midpoint = new THREE.Vector3();
 			locomote.startPoint = new THREE.Vector3();
 			locomote.humpOffset = new THREE.Vector3(0, 0.01, 0);
-		},
+      },
+      createTube: function(){}, 
+      refreshLine: function(){},
+      createLine: function(){}, 
+      refreshTube: function (v0, v1, v2) {
+         this.v0.copy(v0);
+         this.v3.copy(v0);
+         this.v1.copy(v1);
+         this.v2.copy(v2);
+         this.curveObject.geometry.dispose();
+         this.curveObject.geometry = new THREE.TubeBufferGeometry(curve, 24, 0.0075, 2, false);
+      },
+
 		__startHandler: function () {
+         if (this.data.enabled==false) return;
         //console.log('ACTIVE')
 			this.system.toggleOtherHand(this);
 			this.beamEl.setAttribute('raycaster', {
@@ -330,7 +386,8 @@ module.exports = {
          //console.log('NOT ACTIVE')
 			if (cancel && cancel == true) {
 				this.hasDestination = null;
-			}
+         }
+         
 			this.isTesting = null;
 			this.beamEl.setAttribute('raycaster', {
 				enabled: false
@@ -346,10 +403,16 @@ module.exports = {
 			this.curveObject.visible = false;
 			this.destObject.visible = false;
 		},
-		__cancelHandler: function () {
-			this._hideTeleportUI( (AFRAME.utils.deepEqual(this.data.moveOn, this.data.cancelOn))? false : true);
+		__cancelHandler: function (override) {
+         if ( override && override==true) {
+            return this._hideTeleportUI(false);
+         } else {
+            return this._hideTeleportUI( (AFRAME.utils.deepEqual(this.data.moveOn, this.data.cancelOn))? false : true);
+
+         }
 		},
 		__moveHandler: function () {
+         if (this.data.enabled==false) return;
        //console.log('MOVE ACTIVE');
 			if (this.hasDestination) {
 				this.playerTeleportOffset.copy(this.data.camera.object3D.position);
@@ -368,49 +431,69 @@ module.exports = {
 					}
 				}
 			}
+      },
+      __toggleHandler: function () {
+         //console.log('toggled!', this.hasDestination)
+         this.toggled = !this.toggled;
+         if (this.toggled==true){
+            this.hasDestination= true;
+            this.__startHandler();
+         } else {
+            this.hasDestination= null;
+            this.__cancelHandler();
+         }
 		},
 		__angleSolve: function (a, b, dist) {
 			return Number(Math.sqrt((Math.pow(dist, 2)) / ((Math.pow(a, 2)) + (Math.pow(b, 2)))));
-		},
+      },
+      offIntersection: function(){
+         this.hasDestination = null;
+         this.destObject.visible = false;
+         this.lineMaterial.color = this.noColor;
+         this.destinationPoint.set(0, this.rayAim.y * this.offsetScalar , Number(this.data.length*-1)); //Number(this.data.length*-1)); /*this.offsetScalar*/
+         this.midpoint.lerpVectors(this.v0, this.destinationPoint, 0.5);
+         this.humpOffset.setY(this.data.length / 4);
+         this.midpoint.add(this.humpOffset);
+         this.refreshCurveGeo(this.v0,
+            this.midpoint,
+            this.destinationPoint
+         );
+      },
+      onIntersection: function(){
+         this.playerTeleportDestination.copy(this.intersection.point);
+         this.hasDestination = true;
+         this.el.object3D.getWorldPosition(this.startPoint);
+         this.destObject.position.copy(this.intersection.point);
+         this.orientDestNormalVec.copy(this.intersection.face.normal);
+         AFRAME.utils.math.setDirection(this.orientDestNormalVec, this.orientDestQuat);
+         this.destObject.quaternion.copy(this.orientDestQuat);
+         this.destinationPoint.copy(this.intersection.point);
+         this.midpoint.lerpVectors(this.startPoint, this.intersection.point, 0.5);
+         this.humpOffset.setY(this.intersection.distance / 5);
+         this.midpoint.add(this.humpOffset);
+
+         this.refreshCurveGeo(this.v0,
+            this.el.object3DMap.curve.worldToLocal(this.midpoint),
+            this.el.object3DMap.curve.worldToLocal(this.destinationPoint)
+         );
+
+         this.destObject.visible = true;
+         this.lineMaterial.color = this.yesColor;
+      },
 		seekTeleportDestination: function () {
 			this.intersection = this.raycaster.getIntersection(this.testEl);
 			for (this.step = 0; this.step < this.numObjects; this.step++) {
 				this.testEl = this.collisionObjects[this.step];
 				this.intersection = this.raycaster.getIntersection(this.testEl);
 				if (this.intersection) {
-					this.playerTeleportDestination.copy(this.intersection.point);
-					this.hasDestination = true;
-               this.el.object3D.getWorldPosition(this.startPoint);
-					this.destObject.position.copy(this.intersection.point);
-               this.orientDestNormalVec.copy(this.intersection.face.normal);
-               AFRAME.utils.math.setDirection(this.orientDestNormalVec, this.orientDestQuat);
-					this.destObject.quaternion.copy(this.orientDestQuat);
-					this.destinationPoint.copy(this.intersection.point);
-					this.midpoint.lerpVectors(this.startPoint, this.intersection.point, 0.5);
-					this.humpOffset.setY(this.intersection.distance / 5);
-					this.midpoint.add(this.humpOffset);
-					this.refreshCurveGeo(this.v0,
-						this.el.object3DMap.curve.worldToLocal(this.midpoint),
-						this.el.object3DMap.curve.worldToLocal(this.destinationPoint)
-					);
-					this.destObject.visible = true;
-					this.lineMaterial.color = this.yesColor;
+               this.onIntersection();
 				} else {
-					this.hasDestination = null;
-					this.destObject.visible = false;
-					this.lineMaterial.color = this.noColor;
-					this.destinationPoint.set(0, this.rayAim.y * this.offsetScalar , Number(this.data.length*-1)); //Number(this.data.length*-1)); /*this.offsetScalar*/
-					this.midpoint.lerpVectors(this.v0, this.destinationPoint, 0.5);
-					this.humpOffset.setY(this.data.length / 4);
-					this.midpoint.add(this.humpOffset);
-					this.refreshCurveGeo(this.v0,
-						this.midpoint,
-						this.destinationPoint
-					);
+               this.offIntersection();
 				}
 			}
 		},
 		tick: function () {
+         if (this.data.enabled==false) return;
          if (!this.isTesting) return;
         //console.log('boop')
 			this.seekTeleportDestination();

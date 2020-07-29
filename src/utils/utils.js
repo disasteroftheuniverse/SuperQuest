@@ -284,3 +284,5 @@ AFRAME.utils.axishelper = function () {
 	group.add(zLine);
 	return group;
 };
+
+AFRAME.utils.bindAll = require('lodash.bindall');
