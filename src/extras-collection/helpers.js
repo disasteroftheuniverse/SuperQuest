@@ -2,36 +2,11 @@
 
 module.exports = {
 	axes_helper: AFRAME.registerComponent('axes-helper', {
-		schema: {
-			scale: {
-				type: 'vec3',
-				default: {
-					x: 1,
-					y: 1,
-					z: 1
-				}
-			},
-			pos: {
-				type: 'vec3',
-				default: {
-					x: 0,
-					y: 0,
-					z: 0
-				}
-			},
-			rot: {
-				type: 'vec3',
-				default: {
-					x: 0,
-					y: 0,
-					z: 0
-				}
-			},
-			child: {
-				type: 'string',
-				default: 'none'
-			}
-		},
+		schema: { 
+         scale: { type: 'vec3', default: { x: 1, y: 1, z: 1 } }, 
+         pos: { type: 'vec3', default: { x: 0, y: 0, z: 0 } }, 
+         rot: { type: 'vec3', default: { x: 0, y: 0, z: 0 } }, 
+         child: { type: 'string', default: 'none' } },
 		multiple: true,
 		init: function () {
 			var group = AFRAME.utils.axishelper();
@@ -53,14 +28,16 @@ module.exports = {
 		create: function () {
 			var self = this;
 			var buffs = [];
-			var geos = [];
+         var geos = [];
+         
 			self.el.object3D.traverse((node) => {
 				if (node.isBufferGeometry) {
 					buffs.push(node);
 				} else if (node.isGeometry) {
 					geos.push(node);
 				}
-			});
+         });
+         
 			buffs.forEach((bufferGeo) => {
 				//var buffgeo = new THREE.BufferGeometry().
 				var edges = new THREE.EdgesGeometry(bufferGeo.clone());
@@ -69,7 +46,8 @@ module.exports = {
 				}));
 				self.el.object3D.add(line);
 				//
-			});
+         });
+         
 			self.el.removeObject3D('mesh');
 		},
 		tick: function () {

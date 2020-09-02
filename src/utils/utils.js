@@ -203,7 +203,8 @@ AFRAME.utils.getGradientShader = function (name, colorA, colorB) {
 			Bcolor = new THREE.Color(colorB);
 		} else {
 			Bcolor = new THREE.Color().copy(colorB);
-		}
+      }
+      
 		AFRAME.utils.shaders[name] = new THREE.RawShaderMaterial({
 			fragmentShader: 'precision mediump float;\n\nvarying vec2 vUv;\n\nuniform vec3 color1;\nuniform vec3 color2;\n\nvoid main( void ) {\n    vec3 mixCol = mix( color2, color1, vUv.y );\n\tgl_FragColor = vec4(mixCol, 1.);\n}',
 			vertexShader: 'precision highp float;\r\nprecision highp int;\r\n\r\nuniform mat4 modelMatrix;\r\nuniform mat4 modelViewMatrix;\r\nuniform mat4 projectionMatrix;\r\nuniform mat4 viewMatrix;\r\nuniform mat3 normalMatrix;\r\n\r\nattribute vec3 position;\r\nattribute vec3 normal;\r\nattribute vec2 uv;\r\nattribute vec2 uv2;\r\n\r\nvarying vec2 vUv;\r\n\r\nvoid main() {\r\n  vUv = uv;\r\n  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\r\n}',
