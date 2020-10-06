@@ -19,15 +19,9 @@ module.exports = AFRAME.registerComponent('clamp', {
 			}
 		}
 	},
-	init: function () {
-		this.tick = AFRAME.utils.throttleTick(this.tick, 10, this);
-
-		//var dumpIntoConsole = function () {
-      this.el.addState('regulated');
-		//};
-	},
 	tick: function () {
 		if (this.el.is('regulated')) {
+			//restrict movement using THREE native 
 			this.el.object3D.position.clamp(this.data.min, this.data.max);
 		}
 	}

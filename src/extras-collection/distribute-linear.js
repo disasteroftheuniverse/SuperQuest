@@ -38,11 +38,9 @@ module.exports = {
 			}
 		},
 		updateChain: function () {
-			//this.childCounter=0;
-			//var m = new THREE.Vector3()
+
 			for (this.childCounter = 0; this.childCounter < this.numChildren; this.childCounter++) {
 				this.localPosition.lerpVectors(this.firstChild.object3D.position, this.lastChild.object3D.position, this.childCounter / this.numChildren);
-				//console.log(this.localPosition);
 				this.childComponents[this.childCounter].updateAlignment(this.localPosition);
 			}
 		}

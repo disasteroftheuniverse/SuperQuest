@@ -1,11 +1,15 @@
 /*jshint esversion: 8*/
-//var SuperQuestGooglePoly = {};
+
 module.exports = {
 	system: AFRAME.registerSystem('google-poly', {
 		schema: {
 			type: 'string',
 		},
 		__getAsset: function (id, el) {
+			/*
+				check to see if we already 
+				downloaded this mesh before
+			*/
 			if (THREE.Cache.get(id) == undefined) {
 				this.__loadAsset(id, el);
 			} else {
@@ -14,47 +18,99 @@ module.exports = {
 			}
 		},
 		_create: function (object, el) {
+
+			//ensure that the transformation matrices are current
 			object.updateMatrixWorld(true);
+
+			//create helpers
 			var size = new THREE.Vector3();
 			var centerpiv = new THREE.Vector3();
 			var boxLocal = new THREE.Box3().setFromObject(object);
+			
+
+			/*
+				normalize the size of the mesh to 
+			 	the largest dimension in the bounding box 
+				(google poly models have terrible scaling defaults)
+				 
+			*/
+			
 			boxLocal.getSize(size);
 			var largest = Math.max.apply(Math, [size.x, size.y, size.z]);
 			object.scale.multiplyScalar(1 / largest);
 			object.scale.multiplyScalar(el.components.poly.data.size);
+
+			/*
+				center the new mesh at [0,0,0]
+			*/
 			boxLocal.setFromObject(object);
 			boxLocal.getCenter(centerpiv);
 			object.position.sub(centerpiv);
+
+			/* 
+				group under a new Object3D to 'freeze transforms'
+			*/
 			var container = new THREE.Object3D();
 			container.add(object);
+
+			/*
+				add to scene
+			*/
 			el.setObject3D('mesh', container);
 		},
 		__loadAsset: function (id, el) {
+
+			/*
+				use google poly API Key 
+			*/
 			const API_KEY = this.data;
-			var self = this;
+			var self = this; //blah, fix this
 			var url = `https://poly.googleapis.com/v1/assets/${id}/?key=${API_KEY}`;
+
+			/*create request*/
 			var request = new XMLHttpRequest();
 			request.open('GET', url, true);
+
+			/* on request loaded ....*/
 			request.addEventListener('load', function (event) {
+
 				var asset = JSON.parse(event.target.response);
+
+				/*determine what format the mesh is in to use the appropriate loader*/
 				var model3d = function (modelType) {
 					var polyAsset = asset.formats.find(format => {
 						return format.formatType === modelType;
 					});
 					return polyAsset;
 				};
+
+				/*load Wavefront OBJ format models*/
 				var loadOBJ = function (format) {
 					var obj = format.root;
+
+					/*
+						use the [frankly, disgusting] 
+						MTL file included. 
+						It's 2020, stop using OBJ!
+
+					*/
 					var mtl = format.resources.find(resource => {
 						return resource.url.endsWith('mtl');
 					});
+
 					var path = obj.url.slice(0, obj.url.indexOf(obj.relativePath));
+
+					//still disgusted
 					var loader = new THREE.MTLLoader();
+
 					loader.setCrossOrigin(true);
 					loader.setMaterialOptions({
 						ignoreZeroRGBs: true
 					});
+
 					loader.setTexturePath(path);
+
+					/*load and cache OBJ*/
 					loader.load(mtl.url, function (materials) {
 						var loader = new THREE.OBJLoader();
 						loader.setMaterials(materials);
@@ -63,14 +119,16 @@ module.exports = {
 							self._create(object, el, id);
 						});
 					});
+
 				};
+
+				/*loader for GLTF models*/
 				var loadGLTF = function (format) {
 					var obj = format.root;
 					var loader = new THREE.GLTFLoader();
-					loader.setCrossOrigin(true);
+					loader.setCrossOrigin(true); //
 					loader.load(obj.url,
 						function (gltf) {
-							//console.log(THREE.Cache);
 							THREE.Cache.add(id, gltf.scene);
 							self._create(gltf.scene, el, id);
 						},
@@ -82,6 +140,10 @@ module.exports = {
 						}
 					);
 				};
+
+				/*
+					prioritize model download by format
+				*/
 				if (model3d('GLTF2') == undefined) {
 					console.warn('Cannot load model as GLTF. Attempting to load OBJ');
 					if (model3d('OBJ') == undefined) {
@@ -94,15 +156,17 @@ module.exports = {
 					var assetpolyg = model3d('GLTF2');
 					loadGLTF(assetpolyg);
 				}
+
 			});
 			request.send(null);
 		},
 		init: function () {
+			/*I am too scared of collisions*/
 			THREE.Cache.enabled = true;
-			//console.log(THREE.Cache.files);
 			this.__getAsset = this.__getAsset.bind(this);
 			this.__loadAsset = this.__loadAsset.bind(this);
 			this._create = this._create.bind(this);
+
 		}
 	}),
 	component: AFRAME.registerComponent('poly', {

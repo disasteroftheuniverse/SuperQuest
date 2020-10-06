@@ -1,6 +1,7 @@
 /*jshint esversion: 6*/
 
 module.exports = {
+	/*not ready yet*/
 	xml_template: AFRAME.registerComponent('xml-template', {
 		schema: {
 			type: 'asset'
@@ -12,7 +13,7 @@ module.exports = {
 			self.loader.load(
 				self.data,
 				(xml) => {
-					console.log(xml);
+					//console.log(xml);
 				}
 			);
 		}
