@@ -6,6 +6,8 @@ Add-ons for A-Frame VR tailored for Oculus Quest and Oculus Quest 2.
 
 Includes a lightweight physics system optimized for Oculus Browser and components for virtual hands to pick up and manipulate virtual objects.
 
+### [*See Teleport Controls Demo!*](https://sars2-cov.glitch.me/usa-deaths.html)
+
 ### [*See Physics Demo!*](https://glitch.com/~superquest-physics)
 
 <pre> __                        ____                _
