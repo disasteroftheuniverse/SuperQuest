@@ -2,6 +2,10 @@
 
 ![image](https://img.shields.io/badge/status-WIP-orange) ![image](https://img.shields.io/badge/status-concept-lightgrey) [![Documentation Status](https://readthedocs.org/projects/superquest/badge/?version=latest)](https://superquest.readthedocs.io/?badge=latest)
 
+Add-ons for A-Frame VR tailed for Oculus Quest and Oculus Quest 2.
+
+Includes a lightweight physics system optimized for Oculus Browser, and components for virtual hands to pick up and manipulate virtual objects.
+
 <pre> __                        ____                _
 / _\_   _ _ __   ___ _ __ /___ \_   _  ___ ___| |_
 \ \| | | | '_ \ / _ | '__//  / | | | |/ _ / __| __|
@@ -39,6 +43,7 @@ Include this script tag after your A-Frame script tag in the head of your docume
 ```html
 <script src="https://cdn.jsdelivr.net/gh/disasteroftheuniverse/SuperQuest/dist/SuperQuest.full.min.js"></script>
 ```
-## Examples
 
-TODO: basically everything
+
+
+
