@@ -32,7 +32,6 @@
     "es6-template-strings": "^2.0.1",
     "es6-tween": "^5.5.11",
     "javascript-state-machine": "^3.1.0",
-    "lodash.bindall": "^4.4.0",
     "oimo": "^1.0.9"
   },
   "devDependencies": {
