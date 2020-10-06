@@ -4,7 +4,7 @@
 
 Add-ons for A-Frame VR tailored for Oculus Quest and Oculus Quest 2.
 
-Includes a lightweight physics system optimized for Oculus Browser, and components for virtual hands to pick up and manipulate virtual objects.
+Includes a lightweight physics system optimized for Oculus Browser and components for virtual hands to pick up and manipulate virtual objects.
 
 ### [*See Physics Demo!*](https://glitch.com/~superquest-physics)
 
@@ -48,8 +48,8 @@ Include this script tag after your A-Frame script tag in the head of your docume
 
 ## Overview
 * [*Physics Lite*](/src/physics-lite/README.md) - a lightweight alternative to [AFrame-Physics-System](https://github.com/n5ro/aframe-physics-system) with better performance in mobile browsers. It is simply a port of the ever-excellent [_Oimo.js_](https://github.com/lo-th/Oimo.js). 
-* [*Oculus Quest Hand Component*](/src/quest-collection/README.md) - adds a unique prescribed hand model and a large range of prescribed hand animations to accomodate common use-cases. Used in conjunction with *Physics Lite* and/or *grabbable* component (included) to create unique, object-specific hand pick up/gesture/drop animations.
-* [*Extra Components Collection*](/src/extras-collection/README.md) - Assorted Miscellanious components for UI and interaction.
+* [*Oculus Quest Hand Component*](/src/quest-collection/README.md) - adds a unique prescribed hand model and a large selection of prescribed hand animations to accomodate common hand gestures. Used in conjunction with *Physics Lite* and/or *grabbable* component (included) to create unique, object-specific hand pick up/gesture/drop animations.
+* [*Extra Components Collection*](/src/extras-collection/README.md) - Assorted miscellaneous components for UI and interaction.
 
 
 
