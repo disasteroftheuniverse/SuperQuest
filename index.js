@@ -6,6 +6,8 @@
 //  \__/\__,_| .__/ \___|_| \___,_\ \__,_|\___|___/\__|
 //           |_|                                       
 
+require('./src/assets/export/hand_left.glb');
+require('./src/assets/export/hand_right.glb');
 require('./src/utils/utils');
 require('./src/extras-collection/index');
 require('./src/physics-lite/superquest-physics-lite');

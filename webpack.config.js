@@ -22,36 +22,49 @@ module.exports = {
       //chunkFilename: 'js/vendor/[name].js'
    },
    module: {
-      rules: [{
-         test: /.jsx?$/,
-         include: [
-            path.resolve(__dirname, 'src')
-         ],
-         exclude: [
-            path.resolve(__dirname, 'node_modules')
-         ],
-         loader: 'babel-loader',
-         query: {
-            presets: [
-               ['@babel/env', {
-                  'targets': {
-                     'browsers': 'last 2 chrome versions'
-                  }
-               }]
-            ]
-         }
-      },
-		{
-			test: /\.worker\.js$/,
-			use: {
-				loader: 'worker-loader',
-				options: {
-					inline: true,
-					fallback: true,
-					name: '[name].min.js'
-				}
-			},
-		},
+      rules: [
+         {
+            test: /.jsx?$/,
+            include: [
+               path.resolve(__dirname, 'src')
+            ],
+            exclude: [
+               path.resolve(__dirname, 'node_modules'), /\.worker\.js$/
+            ],
+            use: [{
+               loader: 'babel-loader',
+               options: {
+                  presets: [
+                     ['@babel/env', {
+                        'targets': {
+                           'browsers': 'last 2 chrome versions'
+                        }
+                     }]
+                  ]
+               }
+            }]
+         },
+         {
+            test: /\.worker\.js$/,
+            use: [{
+               loader: 'worker-loader',
+               options: {
+                  worker: 'PhysicsWorker',
+                  inline: 'fallback',
+                  //fallback: true,
+                  filename: '[name].min.js'
+               }
+            }],
+         },
+         {
+            test: /\.glb$/,
+            use: {
+               loader: 'file-loader',
+               options: {
+                  name: '[name].glb'
+               }
+            },
+         },
       ]
    },
    plugins: [
